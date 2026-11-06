@@ -4,7 +4,7 @@
 
 A Lens for Snap Spectacles, built for *Learn AR with SPECS* (Devpost).
 
-**Demo video:** https://youtu.be/8F4aW38Uy6o · **Devpost:** https://devpost.com/software/sunpatch-qgwhb7
+**Demo video:** https://youtu.be/romIdOtUb6k · **Devpost:** https://devpost.com/software/sunpatch-qgwhb7
 
 ## What it is
 
