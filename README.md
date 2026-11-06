@@ -4,6 +4,8 @@
 
 A Lens for Snap Spectacles, built for *Learn AR with SPECS* (Devpost).
 
+**Demo video:** https://youtu.be/8F4aW38Uy6o · **Devpost:** https://devpost.com/software/sunpatch-qgwhb7
+
 ## What it is
 
 You are at a 15-minute apartment viewing in November and want to know: *does this living room get winter afternoon sun?* With Sunpatch you pinch the window. A soft patch of light appears on the floor exactly where the sunlight through that window lands, with a small label (`15:10 · Today`). Look at the window and the sun's path for the day appears outside it, with a small sun you can grab (or grab the path anywhere) and drag to change the hour; the patch follows as you drag. A three-part control next to the window picks the day: **Today | Dec 21 | Jun 21**. In December the light reaches deep into the room, to the sofa; in June it stays by the window.
