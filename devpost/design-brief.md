@@ -10,9 +10,9 @@ status: approved
 At a 15-minute apartment viewing, pinch the window once and Sunpatch draws on the real floor where sunlight through that window lands — now, on Dec 21, and on Jun 21 — at any hour you drag the sun to.
 
 The 10-second open (video opening shot):
-- 0–3 s: pinch the window → a gold patch slides onto the floor with a label "15:10 · today".
-- 3–8 s: grab the small sun on the arc outside the window and drag → the patch glides across the floor and the hour label updates; drag to evening → the patch fades, "Sunset 16:21".
-- 8–14 s: one button, "Dec 21" → the arc drops and the patch reaches deep into the room, to the sofa; again, "Jun 21" → the patch retreats to the window.
+- 0–3 s: pinch the window → a soft patch of light grows onto the floor from the window with a label "15:10 · Today".
+- 3–8 s: grab the small sun on the arc outside the window and drag → the patch glides across the floor and the hour label updates; drag to the end of the arc → the light leaves the room, then "Sun has set / Sunset 16:24".
+- 8–14 s: the day control next to the window, "Dec 21" → the arc drops and the patch reaches deep into the room, to the sofa; "Jun 21" → the patch retreats to the window.
 
 **Who it's for:** someone viewing an apartment or house (15 minutes, in November) asking "does the living room get winter afternoon sun?" Second: someone choosing where a plant goes.
 
@@ -28,7 +28,7 @@ The 10-second open (video opening shot):
 - Stand-in for the preview:
   - The room is built in the scene: floor, walls, a window opening on the south-ish wall, a sofa block deep in the room.
   - Each window has an invisible collider (default 120 × 100 cm) that stands in for "the window the pinch hit". Pinching it pins that window.
-  - Location: the preview can't override location, so the Lens uses London (51.5074° N, 0.1278° W) and London time, and says so on screen: "Preview: London · north fixed" (changed after review, see below).
+  - Location: the preview can't override location, so the Lens uses London (51.5074° N, 0.1278° W) and London time, and says so on screen: "Preview · London · north assumed" (changed after review, see below).
   - North: a fixed preview constant (the window wall faces 200°, SSW; was 165° SSE, changed after review) shown by a north marker "N" on the floor, so the viewer can see which way the Lens thinks north is.
   - Time: the real current time by default. Tests (and the demo) can fix the date and time.
 
@@ -36,19 +36,19 @@ The 10-second open (video opening shot):
 - Where the user is looking during the main task: standing in the room about 3.5 m from the window (default), looking at the window and the floor between them; walking closer to grab the sun.
 - Window (stand-in): on the far wall, 120 × 100 cm (default from the design), sill 50 cm above the floor (default), wall facing 200° (SSW) (changed after review; was 165°).
 - Sun patch: on the floor, 1 cm above it, translucent warm gold (no black, additive display). Its shape is the window's 4 corners pushed along the sun direction to the floor, clipped to the room's floor.
-- Patch label: 10 cm above the patch center, white text about 6 cm tall (default) so it reads from 2–3 m: "15:10 · today", "15:10 · Dec 21", "Sun has set", "No direct sun".
+- Patch label: 25 cm above the patch center, turned to face the eye, cap height about 4.5 cm so it reads from 2–3.5 m: "15:10 · Today", "15:10 · Dec 21", "Sun has set", "No direct sun" (changed after the third review).
 - Sun arc (later step): a thin line of today's sun path drawn outside the window, scaled so the whole arc fits around the window (about 1.5 m radius) (default; built at 1.2 m, see below).
-- Sun handle (later step): a 4 cm sphere on the arc (design value), grabbed and dragged along the arc.
-- Season button (later step): UI Kit button 15 cm below-right of the window, at least 8 cm (design value). Labels: "Today" → "Dec 21" → "Jun 21".
+- Sun handle: a 6 cm sun with a 12 cm halo on the arc (was 4 cm), grabbed (24 cm grab sphere, or the arc line anywhere) and dragged along the arc.
+- Day control: three parts "Today | Dec 21 | Jun 21", each 16 × 10 cm, at the window's centre height, 20 cm right of the window (was one UI Kit button 15 cm below-right cycling Today → Dec 21 → Jun 21).
 - Sofa: a simple block, deep in the room (about 2.7–3.4 m from the window wall) (default), so the Dec 21 reach is visible.
-- North marker: a flat "N" with an arrow on the floor near the user, plus a small note "Preview: London · north fixed".
+- North marker: a flat "N" with an arrow on the floor near the user, plus a small standing note "Preview · London · north assumed".
 - Rays (later, optional): 4 thin lines from the window corners to the patch corners.
 
 ## Hands and input
 Mouse = one hand pinching.
 - Pin the window: pinch the window (preview: click the invisible window collider). Pinching another window re-pins.
 - Change the hour: grab-drag the sun handle; it is constrained to today's arc, so it can't leave the sun's real path.
-- Change the season: one button cycles Today → Dec 21 → Jun 21 → Today.
+- Change the season: pinch Today, Dec 21 or Jun 21 on the day control.
 - Targets are big and highlight when aimed at.
 - No voice, no custom or two-hand gestures.
 
@@ -64,13 +64,13 @@ Mouse = one hand pinching.
 Each one can be checked in Lens Studio's preview.
 1. London, 2026-06-21 12:00 UTC: the Lens reports sun altitude ≈ 62° and azimuth ≈ 179° (within 0.5° of the NOAA spreadsheet values 61.93° / 178.86°).
 2. London, 2026-12-21 12:00 UTC: altitude ≈ 15° (NOAA 15.06°, within 0.5°).
-3. London, 2026-11-06 20:00: the sun is below the horizon → the patch (and handle) are hidden and the label says "Sun has set".
+3. London, 2026-11-06 20:00: the sun is below the horizon → the patch is hidden and the label says "Sun has set" (the sun handle waits, dimmed, at the arc's sunset end so the hour can still be dragged; changed after the third review).
 4. South window at noon: the Dec 21 patch reaches farther from the window than the Jun 21 patch.
 5. The patch's 4 corners lie on the floor (1 cm above it) and on the rays from the window's 4 corners along the sun direction.
 6. North window at noon: no patch, label "No direct sun".
 7. Dragging the sun handle along the arc moves the time forward monotonically and updates the label.
-8. Pressing the season button 3 times comes back to Today; pinching another window moves the patch and the arc to that window.
-9. Looking away from the patch shows the edge arrow; looking at it hides it (first to cut).
+8. The day control picks Dec 21, Jun 21 and Today again; pinching another window moves the patch, the arc and the control to that window.
+9. Looking elsewhere for 1.5 s with the patch out of view shows the edge arrow; looking at it hides it; looking at the window never shows it (first to cut).
 
 ## Out of scope
 - Patches on walls, tree shade outdoors, curtains, neighbouring buildings, the moon.
@@ -143,3 +143,23 @@ Second build (2026-11-05, London date 2026-11-06):
 - **Preview note** shortened to "Preview: London · north fixed" and moved onto the floor next to the "N" marker.
 - **New criteria 10–12** (gaze switching, reduceMotion, no claims) added to the tests; all 12 scenarios pass in the preview.
 - The season button keeps the Snap UI Kit default look (dark plate, white text), which reads as text only on the additive display.
+
+Third build (2026-11-05, three independent reviews: bugs, Apple spatial design guidelines, motion):
+
+How conflicts were decided: spatial-design "must" items first, then bugs, then motion, then spatial-design "nice" items. All of the motion review's "do not animate" list is kept, except one item that a "must" overrides (below).
+
+- **The sun handle can always be reached (bug 1, 9; must 1).** If the current time is not on the lit arc (night, or the sun behind the wall), the handle waits, dimmed, at the nearest end of the arc and can still be grabbed. While it is held, and for 1 s after, the arc and handle stay even if you look at the floor, and the floor label shows too. Done criterion 3 now says the handle waits instead of hiding: hiding it left no way to change the hour.
+- **The arc's end is the sunset (bug 2, 3).** The arc runs to the NOAA sunset time and the patch goes off at that same time (it used to go off 110 s earlier at 0° altitude). Dragging to the end now really shows "Sun has set / Sunset 16:24", as the brief always said.
+- **Chime (bug 4; must 2; motion 6).** At most once per pinned window, only after a pin or a day change moved the light while it was not seen, and never within 600 ms of the change. Bug 4 asked for once per window and season; the spatial review asked for chimes only when the light moved out of view. Once per window is the calmer of the two and satisfies both.
+- **Off-view arrow (must 2, 6; bug 10; motion 6).** Only after 1.5 s looking elsewhere (the review's 1.5 s wins over the motion review's 250 ms), never while looking at the window or holding the sun; a shaft arrow 1 m ahead that follows the head lazily (200 ms, the review's value over the motion review's 60 ms); view test out at 85 %, back in at 75 % (bug 10's 0.75 over the motion review's 0.70).
+- **Day control (must 3).** Three parts showing the chosen day, light plates, hover +0.15, press 0.96, a soft tick. Built with SIK parts rather than UI Kit because the UI Kit button could not take the light plate colours; the old button was removed.
+- **Onboarding (must 4).** "Pinch a window" and breathing window outlines (0.15–0.35, 1.2 s) before the first pin; "Drag the sun" after it. The breathing outline is the one loop in the Lens: the motion review says nothing should loop, but onboarding is a must and it stops at the first pin (steady with reduce motion). "Drag the sun" sits 12 cm below the handle because the clock takes the 12 cm-above spot (must 8).
+- **Handle and arc (must 5, 8; nice 12).** Sizes in "Where things live"; hover and hold change only the halo (motion review: no colour change on the handle). Arc ends carry a small clock, the behind-the-wall part is a faint dashed line, solar noon is a slightly larger dot.
+- **Honest note (must 7; bug 8).** Standing, facing the eye: "Preview · London · north assumed". The start rule now also falls back to 15:10 when the sun is under 6° or its light would land outside the room; the note's second line says why for 6 s ("Sun is down now, showing 15:10").
+- **Light like light (nice 9).** Colour and opacity from the altitude, penumbra-width edge, rays only while dragging and for 2 s after a change. The additive blend for glasses is noted, not set (the preview floor is grey).
+- **Day change motion (motion 3; nice 10).** 500 ms ease-in-out for the arc and the patch (the motion review's 500 ms over the spatial review's 600 ms); a patch move over 150 cm crossfades instead (nice 10), so a large bright area never sweeps the room.
+- **Pin moment (motion 1).** Rays, then the patch grows from its window-side edge (400 ms), the label 120 ms later, the control after 350 ms (delay only).
+- **Drag, sunset, gaze (motion 2, 4, 5).** Critically damped spring for the patch, whole minutes with a 0.35 min dead band, the label follows the drawn patch; patch fades out in place at sunset and the label crossfades instead of jumping; gaze 120 ms in / 250 ms out with a 15 cm exit margin (the motion review's values over the spatial review's single 250 ms / 20 cm). Reduce motion makes everything instant but keeps these filters.
+- **Text (nice 11, 14, 16; bug 7).** "Today" capitalised everywhere; the night label also says the clock; the handle readout always has the event line above the clock; label plates at 0.7 opacity. Medium font weight was not applied (the default font gives no reliable medium style).
+- **Small fixes.** Bad times are refused instead of producing NaN (bug 5); the clock is UK time whatever the place, now said in the inputs (bug 6); meshes are reused instead of rebuilt every frame (bug 11); a degenerate frame hides the patch instead of leaving a stale one (bug 12); rays stop at the walls (bug 13); a destroyed pinned window is cleared (bug 14); the control's size comes from its parts (bug 15).
+- **Tests.** New criteria 13 (handle reach, hover, hold, sunset end, clipping) and 14 (onboarding, pin order, honest note, bad time). Updated: 3 (NOAA times, sunset match, waiting handle), 8 (three parts and layout), 9 (1.5 s rule, arrow direction and distance, one chime for three day changes), 10 (patch opacity follows the altitude: 0.28 at noon in November, so the old fixed "> 0.3" became "at its altitude target"), 11 (crossfade over 1.5 m; with reduce motion the patch must also be fully visible), 12 (texts found from the objects, not by name; the walk must find them). All 14 pass.

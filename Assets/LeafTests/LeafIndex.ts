@@ -37,7 +37,7 @@ export class LeafIndex extends BaseScriptComponent {
     {
       id: "sunpatch-pose",
       typename: SunpatchPoseScenario.getTypeName(),
-      parameters: { window: "WindowSouth", utc: "2026-11-05T15:10:00Z", season: "today" },
+      parameters: { window: "WindowSouth", utc: "2026-11-05T15:10:00Z", season: "today", hand: "none", handMs: "20000" },
     },
   ]
 }
