@@ -32,6 +32,7 @@
     featherMaxCm: false
     featherMinCm: false
     floor: false
+    furnitureTop: false
     liftCm: false
     patchMaterial: false
     penumbraPerCm: false
@@ -54,6 +55,7 @@
       penumbraPerCm: 0.009300
       featherMinCm: 2.500000
       featherMaxCm: !<float> 6.000000
+      furnitureTop: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       rayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       rayWidthCm: 0.800000
       rayAlpha: 0.120000
@@ -68,6 +70,7 @@
     - "// @input float penumbraPerCm = 0.0093 {\"hint\":\"Penumbra per cm of distance from the window (the sun's angular size, 0.53 deg).\"}"
     - '// @input float featherMinCm = 2.5 {"hint":"Soft border limits (cm)."}'
     - // @input float featherMaxCm = 6
+    - '// @input SceneObject furnitureTop {"hint":"Optional: a furniture box (e.g. the sofa seat). Light that reaches its top is drawn on the top, not under it."}'
     - '// @input Asset.Material rayMaterial {"hint":"Optional: very faint material for the 4 rays window -> patch."}'
     - '// @input float rayWidthCm = 0.8 {"hint":"Width of each ray line (cm)."}'
     - '// @input float rayAlpha = 0.12 {"hint":"Ray opacity while shown."}'

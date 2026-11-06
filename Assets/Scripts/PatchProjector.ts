@@ -104,6 +104,11 @@ export class PatchProjector extends BaseScriptComponent {
 
   @input
   @allowUndefined
+  @hint("Optional: a furniture box (e.g. the sofa seat). Light that reaches its top is drawn on the top, not under it.")
+  furnitureTop: SceneObject
+
+  @input
+  @allowUndefined
   @hint("Optional: very faint material for the 4 rays window -> patch.")
   rayMaterial: Material
 
@@ -142,6 +147,12 @@ export class PatchProjector extends BaseScriptComponent {
   private dirty: boolean = false
   private dragging: boolean = false
 
+  private topObj: SceneObject | null = null
+  private topRmv: RenderMeshVisual | null = null
+  private topMb: MeshBuilder | null = null
+  private light: vec3 = new vec3(0, -1, 0)
+  private topPoly: vec3[] = []
+
   private rayObj: SceneObject | null = null
   private rayRmv: RenderMeshVisual | null = null
   private rayMat: Material | null = null
@@ -162,6 +173,14 @@ export class PatchProjector extends BaseScriptComponent {
     this.rmv.setRenderOrder(10)
     this.patchMb = newBuilder()
     this.patchObj.enabled = false
+    if (this.furnitureTop) {
+      this.topObj = global.scene.createSceneObject("SunPatchOnFurniture")
+      this.topObj.setParent(this.patchObj)
+      this.topRmv = this.topObj.createComponent("Component.RenderMeshVisual") as RenderMeshVisual
+      this.topRmv.mainMaterial = this.mat
+      this.topRmv.setRenderOrder(10)
+      this.topMb = newBuilder()
+    }
     if (this.rayMaterial) {
       this.rayObj = global.scene.createSceneObject("SunRays")
       this.rayRmv = this.rayObj.createComponent("Component.RenderMeshVisual") as RenderMeshVisual
@@ -191,6 +210,33 @@ export class PatchProjector extends BaseScriptComponent {
     const p = t.getWorldPosition()
     const s = t.getWorldScale()
     return [p.x - s.x / 2, p.x + s.x / 2, p.z - s.z / 2, p.z + s.z / 2]
+  }
+
+  /** Top of the furniture box: [y, minX, maxX, minZ, maxZ] (world), or null if none. */
+  furnitureTopRect(): number[] | null {
+    if (!this.furnitureTop) return null
+    const t = this.furnitureTop.getTransform()
+    const p = t.getWorldPosition()
+    const s = t.getWorldScale()
+    return [p.y + s.y / 2 + this.liftCm, p.x - s.x / 2, p.x + s.x / 2, p.z - s.z / 2, p.z + s.z / 2]
+  }
+
+  /**
+   * Floor area the furniture top shades: its top rectangle moved down along the light to the floor
+   * ([minX, maxX, minZ, maxZ]), or null. Light that lands on the top does not reach the floor there.
+   */
+  floorShadowRect(): number[] | null {
+    const r = this.furnitureTopRect()
+    if (!r || Math.abs(this.light.y) < 1e-4) return null
+    const k = (this.getPatchPlaneY() - r[0]) / this.light.y
+    const dx = this.light.x * k
+    const dz = this.light.z * k
+    return [r[1] + dx, r[2] + dx, r[3] + dz, r[4] + dz]
+  }
+
+  /** Drawn polygon of the light on the furniture top (world), empty if none. */
+  getFurniturePolygon(): vec3[] {
+    return this.topPoly
   }
 
   getLast(): PatchResult {
@@ -360,6 +406,7 @@ export class PatchProjector extends BaseScriptComponent {
       ts = new vec3(h.x, minY, h.z)
     }
     const light = ts.uniformScale(-1)
+    this.light = light
     const y = this.getPatchPlaneY()
     const corners = win.corners.map((c) => c.add(light.uniformScale((y - c.y) / light.y)))
     const rect = this.floorRect()
@@ -505,11 +552,14 @@ export class PatchProjector extends BaseScriptComponent {
     const inv = this.patchObj.getTransform().getInvertedWorldTransform()
     const verts: number[] = []
     const idx: number[] = []
+    const shadow = this.floorShadowRect()
     for (let j = 0; j < 3; j++) {
       for (let i = 0; i < 3; i++) {
         const s0 = sCuts[i], s1 = sCuts[i + 1], t0 = tCuts[j], t1 = tCuts[j + 1]
         if (s1 - s0 < 1e-6 || t1 - t0 < 1e-6) continue
-        const cell = clipToRect([at(s0, t0), at(s1, t0), at(s1, t1), at(s0, t1)], rect[0], rect[1], rect[2], rect[3])
+        const whole = clipToRect([at(s0, t0), at(s1, t0), at(s1, t1), at(s0, t1)], rect[0], rect[1], rect[2], rect[3])
+        if (whole.length < 3) continue
+        for (const cell of outsideRect(whole, shadow)) {
         if (cell.length < 3) continue
         const base = verts.length / 8
         for (const w of cell) {
@@ -521,13 +571,43 @@ export class PatchProjector extends BaseScriptComponent {
           verts.push(p.x, p.y, p.z, 0, 1, 0, texOf(ss, sCuts), texOf(tt, tCuts))
         }
         for (let k = 1; k + 1 < cell.length; k++) idx.push(base, base + k, base + k + 1)
+        }
       }
     }
-    if (idx.length === 0) { this.rmv.enabled = false; return }
+    if (idx.length === 0) { this.rmv.enabled = false; this.buildTop(corners); return }
     refill(this.patchMb, verts, idx)
     if (this.rmv.mesh === null || this.rmv.mesh === undefined) this.rmv.mesh = this.patchMb.getMesh()
     this.rmv.enabled = true
+    this.buildTop(corners)
     this.buildRays(corners)
+  }
+
+  /**
+   * Light on the furniture top: the same 4 rays stopped at the top's height (each floor corner moved
+   * back along the light), clipped to the top's rectangle. Same material, so colour, opacity and
+   * fades follow the floor patch. Edges stay hard (the top's edge is a real edge).
+   */
+  private buildTop(corners: vec3[]): void {
+    this.topPoly = []
+    if (!this.topObj || !this.topRmv || !this.topMb) return
+    const r = this.furnitureTopRect()
+    if (!r || corners.length !== 4 || Math.abs(this.light.y) < 1e-4) { this.topRmv.enabled = false; return }
+    const L = this.light
+    const onTop = corners.map((c) => c.add(L.uniformScale((r[0] - c.y) / L.y)))
+    const poly = clipToRect(onTop, r[1], r[2], r[3], r[4])
+    if (poly.length < 3) { this.topRmv.enabled = false; return }
+    const inv = this.topObj.getTransform().getInvertedWorldTransform()
+    const verts: number[] = []
+    const idx: number[] = []
+    for (const w of poly) {
+      const q = inv.multiplyPoint(new vec3(w.x, r[0], w.z))
+      verts.push(q.x, q.y, q.z, 0, 1, 0, 0.5, 0.5)
+    }
+    for (let k = 1; k + 1 < poly.length; k++) idx.push(0, k, k + 1)
+    refill(this.topMb, verts, idx)
+    if (this.topRmv.mesh === null || this.topRmv.mesh === undefined) this.topRmv.mesh = this.topMb.getMesh()
+    this.topRmv.enabled = true
+    this.topPoly = poly.map((w) => new vec3(w.x, r[0], w.z))
   }
 
   /** Four thin cross-shaped strips from the window corners to the patch corners, cut at the walls. */
@@ -598,6 +678,18 @@ function cutAtRoom(a: vec3, b: vec3, rect: number[]): vec3 {
   lim(a.x, d.x, rect[0], rect[1])
   lim(a.z, d.z, rect[2], rect[3])
   return a.add(d.uniformScale(Math.max(0, t)))
+}
+
+/** Parts of a convex x/z polygon outside an axis-aligned rectangle (null rect: the polygon itself). */
+export function outsideRect(pts: vec3[], r: number[] | null): vec3[][] {
+  if (!r) return [pts]
+  const B = 1e7
+  return [
+    clipToRect(pts, -B, r[0], -B, B),
+    clipToRect(pts, r[1], B, -B, B),
+    clipToRect(pts, r[0], r[1], -B, r[2]),
+    clipToRect(pts, r[0], r[1], r[3], B),
+  ].filter((p) => p.length >= 3)
 }
 
 /** Sutherland–Hodgman clip of a convex polygon (x/z plane) against an axis-aligned rectangle. */

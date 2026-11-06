@@ -4597,6 +4597,7 @@
       penumbraPerCm: 0.009300
       featherMinCm: 2.500000
       featherMaxCm: !<float> 6.000000
+      furnitureTop: !<reference.SceneObject> 0ac2376f-650e-4dc6-bbb0-20d5ce792d24
       rayMaterial: !<reference.Material> f2f331ea-d30b-43f1-b4ea-ced0582f89c5
       rayWidthCm: 0.800000
       rayAlpha: 0.120000

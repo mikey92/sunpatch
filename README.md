@@ -71,7 +71,7 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 - **Readable at 3–4 m.** Label cap height about 4.5 cm, 25 cm above the patch and turned to face you; sun clock about 5 cm, 12 cm above a 6 cm sun with a 12 cm halo and a 24 cm grab sphere; the arc line is 1.2 cm with 3 cm hour dots, a faint dashed line where the sun is behind the wall, and the visible ends marked (`13:09`, `Sunset 16:24`). The day control is three 16 × 10 cm parts at the window's centre height, 20 cm to its right, light plates (no dark plates on an additive display).
 - **Calm motion.** Arriving things ease out, leaving things ease in, things that move to a new place ease in-out. On the pin: rays, then the patch grows from the window side (400 ms), then the label (120 ms later), then the day control (350 ms, a delay only). Dragging: the patch follows on a critically damped spring (no overshoot) and the clock moves in whole minutes with a small dead band. Day change: arc and patch move together in 500 ms; a move over 1.5 m crossfades instead of sweeping. Sunset: the patch fades in place, the label crossfades. Gaze: 120 ms to show, 250 ms to hide, a 15 cm larger area on the way out. Nothing pulses; the only loop is the onboarding outline before the first pin. `reduceMotion` makes every change instant (the anti-flicker filters stay).
 
-## Tests (LEAF, all passing in the Lens Studio preview)
+## Tests (LEAF, 15 scenarios, all passing in the Lens Studio preview)
 
 | # | Scenario | What it checks | Result |
 |---|---|---|---|
@@ -89,6 +89,7 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 | 12 | `sunpatch-c12-no-claims` | 3 windows × 3 days × 24 hours: no judgement words, no numbers other than clock times and dates; the scene walk finds the Lens's texts from the objects, not by name | Pass — 1,915 texts |
 | 13 | `sunpatch-c13-handle-reach` | Sun up but off the arc → handle waits dimmed at the nearest end and a real drag brings the light in; real hover → halo 0.45 ×1.25; arc and handle never fade while held (gaze on the floor) and 0.5 s after; the arc's end = sunset; `Sun lands beyond this room` at 16:00; clipped polygon at 15:10 | Pass — 0 frames off |
 | 14 | `sunpatch-c14-first-minute` | Onboarding hint and breathing outlines (0.15–0.35); pin order rays → patch grows from the window side → label (+132 ms) → control; pinned outline 0.35; `Drag the sun` until the first drag; honest 15:10 note for 6 s; a bad time is refused | Pass |
+| 15 | `sunpatch-c15-furniture-light` | Dec 21 noon: the light that reaches the sofa is drawn on the seat top (every point at the seat's height, inside the seat, and on a ray back through the window); the floor behind the seat is in its shadow; Jun 21 noon: nothing on the seat | Pass |
 
 `sunpatch-pose` is not a test: it pins a window and fixes the time for screenshots.
 
@@ -102,7 +103,7 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 ## Limitations
 
 - Preview only: London location, fixed north (200°), built room and windows. On Spectacles the location, heading and pinched window would be real; the heading sign on the device is not verified (no device was available).
-- The patch is drawn on the floor plane only; light on walls and furniture, curtains, trees and neighbouring buildings are out of scope. The patch is clipped where the room ends, and it shows under furniture rather than on it.
+- The patch is drawn on the floor plane only; light on walls and furniture, curtains, trees and neighbouring buildings are out of scope. The patch is clipped where the room ends. Light that reaches the sofa is drawn on its seat top, and the floor behind the seat is left in its shadow; other furniture faces (the sofa's front and arms) are not lit.
 - The sun handle must be within the 5 m reach of the pinch ray; stand within about 4.5 m of the window to grab it.
 - Comfort, readability and hand tracking on real glasses are not proven; only the logic is tested. On glasses the patch material should add light (additive blend) and the window glass tint should be off; the preview keeps normal blending and the tint so it reads on the grey preview floor.
 
