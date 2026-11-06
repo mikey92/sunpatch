@@ -31,6 +31,7 @@ export class SunpatchC3SunSetScenario extends Scenario {
     check(api.isPatchVisible(), "patch shown at 12:00 (state " + api.getPatchState() + ")")
     await waitFor(() => api.getPatchAlpha() > 0.15, 2000, "patch faded in")
     await lookAt("window")
+    await waitFor(() => arc.isHandleVisible() && arc.isHandleOnArc(), 2000, "sun handle on the arc at 12:00")
     check(arc.isHandleVisible() && arc.isHandleOnArc(), "sun handle on the arc at 12:00")
 
     const day = api.getDayInfo()

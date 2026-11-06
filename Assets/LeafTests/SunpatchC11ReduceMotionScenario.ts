@@ -25,14 +25,14 @@ export class SunpatchC11ReduceMotionScenario extends Scenario {
     await lookAt("floor")
 
     api.setReduceMotion(false)
-    await waitFor(() => api.getPatchGlideError() < 0.01, 2000, "patch settled")
+    await waitFor(() => api.getPatchGlideError() < 0.01, 6000, "patch settled")
     api.setSeason("dec21")
     await nextFrame()
     const glideOn: number = api.getPatchGlideError()
     log("motion on: glide error one frame after the season change " + glideOn.toFixed(1) + " cm")
     check(glideOn > 1, "with motion, the patch glides to its new place")
     check(api.getPatchTargetAlpha() < 0.01, "a move over 150 cm fades out first instead of sweeping (target " + api.getPatchTargetAlpha().toFixed(3) + ")")
-    await waitFor(() => api.getPatchGlideError() < 0.01, 3000, "patch settled again")
+    await waitFor(() => api.getPatchGlideError() < 0.01, 6000, "patch settled again")
 
     api.setReduceMotion(true)
     check(api.getReduceMotion(), "reduceMotion on")

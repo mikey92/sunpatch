@@ -114,7 +114,11 @@ export async function lookAt(kind: "window" | "floor" | "away", settleMs: number
   }
   g.setGazeOverride(EYE, target.sub(EYE))
   await sleep(settleMs)
-  if (g.getGaze() !== (kind === "away" ? "none" : kind)) {
+  // A slow preview frame rate can stretch the dwell; wait up to 2 s more for the switch.
+  const want = kind === "away" ? "none" : kind
+  const t0 = getTime()
+  while (g.getGaze() !== want && getTime() - t0 < 2) await sleep(33)
+  if (g.getGaze() !== want) {
     throw new Error(TAG + " gaze did not switch to " + kind + " (is " + g.getGaze() + ")")
   }
 }

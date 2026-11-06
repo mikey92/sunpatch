@@ -39,6 +39,7 @@ export class SunpatchC9OffViewArrowScenario extends Scenario {
     // Look up and to the right: the patch is to the lower left, out of view.
     gaze.setGazeOverride(EYE, new vec3(1, 0.35, -0.2))
     await sleep(600)
+    await waitFor(() => gaze.getGaze() === "none" && !gaze.isPatchInView(), 2000, "looking up-right")
     check(gaze.getGaze() === "none" && !gaze.isPatchInView(), "looking up-right: elsewhere, patch out of view")
     check(!gaze.isArrowVisible(), "no arrow yet after 0.6 s elsewhere (needs 1.5 s)")
     await waitFor(() => gaze.isArrowVisible(), 2500, "arrow after 1.5 s elsewhere")

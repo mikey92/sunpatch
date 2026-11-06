@@ -9,8 +9,8 @@
  * Look (like real light, calm):
  *   - Colour follows the sun's altitude: near white above 40 deg, pale gold at 15 deg, warm
  *     amber at 5 deg and below (interpolated).
- *   - Opacity follows floor illuminance (~ sin altitude): 0.16 + 0.22 sin(alt)^0.6 (0.22 at 9 deg,
- *     0.36 at 62 deg), times a smooth ramp to 0.15 below 6 deg. A long winter patch is dimmer.
+ *   - Opacity follows floor illuminance (~ sin altitude): 0.34 + 0.30 sin(alt)^0.6 (0.44 at 9 deg,
+ *     0.62 at 62 deg), times a smooth ramp to 0.15 below 6 deg. A long winter patch is dimmer.
  *   - The soft border is the real penumbra: 0.0093 x the distance from the window to the floor
  *     point (the sun is 0.53 deg wide), 2.5-6 cm, centred on the true outline; inside is even.
  *   - Four faint rays from the window corners to the patch corners show only while the sun is
@@ -285,7 +285,7 @@ export class PatchProjector extends BaseScriptComponent {
 
     if (this.isVisible()) {
       const alt = Math.max(0, altitudeDeg)
-      const level = (0.16 + 0.22 * Math.pow(Math.sin(alt * DEG), 0.6)) * (0.15 + 0.85 * smoothstep(0, this.fadeBelowDeg, alt))
+      const level = (0.34 + 0.30 * Math.pow(Math.sin(alt * DEG), 0.6)) * (0.15 + 0.85 * smoothstep(0, this.fadeBelowDeg, alt))
       const color = lightColor(alt)
       let dist = 0
       for (let i = 0; i < 4; i++) dist += win!.corners[i].distance(r.corners[i])

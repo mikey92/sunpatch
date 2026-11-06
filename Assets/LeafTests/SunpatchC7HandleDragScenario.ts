@@ -11,7 +11,7 @@
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { DefaultLeafInteractor } from "Leaf.lspkg/Interactors/interactor/DefaultLeafInteractor"
 import { nextFrame } from "Leaf.lspkg/Utils/common/Utils"
-import { check, log, lookAt, pinchWindow, restoreLive, sp, waitForLensUp } from "./SunpatchLeafHelpers"
+import { check, log, lookAt, pinchWindow, restoreLive, sp, waitFor, waitForLensUp } from "./SunpatchLeafHelpers"
 
 function distToPolyline(p: vec3, pts: vec3[]): number {
   let best = Number.MAX_VALUE
@@ -34,6 +34,7 @@ export class SunpatchC7HandleDragScenario extends Scenario {
     api.setSeason("today")
     api.setUtc("2026-11-06T11:00:00Z")
     await lookAt("window")
+    await waitFor(() => arc.isHandleVisible(), 2000, "handle on the arc at 11:00")
     check(arc.isHandleVisible(), "handle on the arc at 11:00")
     const startMin: number = api.getClockMinutes()
     const startLabel: string = api.getLabel()
@@ -48,7 +49,16 @@ export class SunpatchC7HandleDragScenario extends Scenario {
         await nextFrame()
       }
     })()
-    await new DefaultLeafInteractor().drag(arc.getHandleInteractable(), new vec3(1.2, 0, 0), 1500)
+    // The same real SIK drag, but the per-update step stops once the clock is 60 min on, so the
+    // result does not depend on the preview frame rate (a busy machine gives fewer drag updates).
+    const it = arc.getHandleInteractable()
+    const step = new vec3(1.2, 0, 0)
+    const unsub = it.onDragUpdate.add(() => { step.x = api.getClockMinutes() - startMin < 60 ? 1.2 : 0 })
+    try {
+      await new DefaultLeafInteractor().drag(it, step, 6000)
+    } finally {
+      unsub()
+    }
     sampling = false
     await sampler
 

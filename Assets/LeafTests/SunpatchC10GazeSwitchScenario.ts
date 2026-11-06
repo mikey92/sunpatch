@@ -4,7 +4,7 @@
  * South window, London 2026-11-06 12:00 (patch inside the room). Gaze is scripted through
  * GazeDisclosure's override. Each switch is checked after the fade has settled.
  * The patch's opacity is checked against its target (after the review it follows the sun's
- * altitude, 0.16 + 0.22 sin(alt)^0.6: about 0.28 at noon in November), not a fixed 0.3.
+ * altitude, 0.34 + 0.30 sin(alt)^0.6: about 0.46 at noon in November), not a fixed 0.3.
  * Also: looking at the window never shows the off-view arrow.
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
@@ -13,7 +13,7 @@ import { check, log, lookAt, pinchWindow, restoreLive, sp, waitFor, waitForLensU
 /** Patch fully in (at its target opacity, which is the altitude formula and clearly visible). */
 function lit(api: any): boolean {
   const s = api.getSunAltAz()
-  const want = 0.16 + 0.22 * Math.pow(Math.sin(s.altitude * Math.PI / 180), 0.6)
+  const want = 0.34 + 0.30 * Math.pow(Math.sin(s.altitude * Math.PI / 180), 0.6)
   return Math.abs(api.getPatchAlpha() - want) < 0.005 && want > 0.2
 }
 
