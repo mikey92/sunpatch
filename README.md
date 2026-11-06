@@ -103,7 +103,7 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 ## Limitations
 
 - Preview only: London location, fixed north (200°), built room and windows. On Spectacles the location, heading and pinched window would be real; the heading sign on the device is not verified (no device was available).
-- The patch is drawn on the floor plane only; light on walls and furniture, curtains, trees and neighbouring buildings are out of scope. The patch is clipped where the room ends. Light that reaches the sofa is drawn on its seat top, and the floor behind the seat is left in its shadow; other furniture faces (the sofa's front and arms) are not lit.
+- The light is drawn on the floor and on the sofa's seat top (with the seat's shadow left on the floor behind it). Light on walls and on other furniture faces (the sofa's front and arms), curtains, trees and neighbouring buildings are out of scope. The patch is clipped where the room ends.
 - The sun handle must be within the 5 m reach of the pinch ray; stand within about 4.5 m of the window to grab it.
 - Comfort, readability and hand tracking on real glasses are not proven; only the logic is tested. On glasses the patch material should add light (additive blend) and the window glass tint should be off; the preview keeps normal blending and the tint so it reads on the grey preview floor.
 
