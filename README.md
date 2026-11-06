@@ -8,7 +8,7 @@ A Lens for Snap Spectacles, built for *Learn AR with SPECS* (Devpost).
 
 ## What it is
 
-You are at a 15-minute apartment viewing in November and want to know: *does this living room get winter afternoon sun?* With Sunpatch you pinch the window. A soft patch of light appears on the floor exactly where the sunlight through that window lands, with a small label (`15:10 · Today`). Look at the window and the sun's path for the day appears outside it, with a small sun you can grab (or grab the path anywhere) and drag to change the hour; the patch follows as you drag. A three-part control next to the window picks the day: **Today | Dec 21 | Jun 21**. In December the light reaches deep into the room, to the sofa; in June it stays by the window.
+You are at a 15-minute apartment viewing in November and want to know: *does this living room get winter afternoon sun?* With Sunpatch you pinch the window. A soft patch of light appears on the floor exactly where the sunlight through that window lands, with a small label (`15:10 · Today`). Look at the window and the sun's path for the day appears outside it, with a small sun you can grab (or grab the path anywhere) and drag to change the hour; the patch follows as you drag. A three-part control next to the window picks the day: **Today | Dec 21 | Jun 21**. In December the light reaches deep into the room, to the sofa; in June it stays by the window. Then stand where a chair would go and look down: a ring of the twelve months on the floor shows which months that spot gets direct sun, and one line says when (`Sun here: Sep–Mar` / `11:20–14:30`).
 
 ## Who it is for
 
@@ -27,8 +27,9 @@ You are at a 15-minute apartment viewing in November and want to know: *does thi
 1. Pinch the window → faint rays, then the patch grows onto the floor from the window side, then `15:10 · Today`. `Drag the sun` shows under the sun until you first drag it.
 2. Look at the window, grab the sun (or the arc anywhere) and drag → the patch follows; drag toward evening and the light leaves the room (`Sun lands beyond this room`); the arc's end is the sunset itself (`Sun has set / Sunset 16:24`).
 3. Pinch **Dec 21** → the arc drops and the patch reaches the sofa; **Jun 21** → the arc rises and the patch retreats to the window; **Today** → back.
+4. Stand where a chair would go and look down → a ring of 12 months appears on the floor where you look (Jan toward the window, then clockwise); gold months get direct sun there. The line in the middle says which months and when (`Sun here: Sep–Mar` / `11:20–14:30`, or `No direct sun here`). Step toward the window and it changes (`Mar–Sep` / `10:00–15:00`). Your body is the input: nothing to pinch.
 
-What you see is chosen by where you look: the window shows the arc and the sun; the floor shows the patch label; anywhere else shows only the light itself. While you hold the sun, the arc and the floor label both stay. If you look elsewhere for 1.5 s and the light is out of view, a small gold arrow 1 m ahead, near the edge of the view, points to it. One soft chime sounds at most once per pinned window, only if a pin or a day change moved the light while you had not seen it.
+What you see is chosen by where you look: the window shows the arc and the sun; the floor shows the patch label; the floor at your feet shows the month ring (and the patch label steps aside); anywhere else shows only the light itself. While you hold the sun, the arc and the floor label both stay. If you look elsewhere for 1.5 s and the light is out of view, a small gold arrow 1 m ahead, near the edge of the view, points to it. One soft chime sounds at most once per pinned window, only if a pin or a day change moved the light while you had not seen it.
 
 ## Not a simulation — and an honest preview
 
@@ -59,6 +60,8 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 
 So in this room the sofa gets direct sun only from late November to late January, around midday, and never from February to October. That is the answer a 15-minute viewing in November can't give by looking, and the one Sunpatch draws. LEAF criterion 15 checks the same edge in the Lens: light on the seat on Jan 21 at noon, none on Feb 21.
 
+The month ring (`SpotSun.ts`) asks the same question for any spot you stand at: for the 21st of each month, every 10 minutes of the UK day, does the ray from that floor spot toward the sun leave the room through the window's opening without passing through the sofa? The floor under the sofa never gets direct sun; the spot just in front of it gets September to March, late morning to mid-afternoon.
+
 The same window in other cities (light's centre at local solar noon): London 3.44 m in on Dec 21 and 0.50 m on Jun 21; Seoul 1.68 m / 0.23 m; San Diego 1.38 m / 0.15 m; Oslo 4.81 m / 0.69 m. On glasses the location is the device's, so the patch is drawn for wherever you stand.
 
 ## How it was made
@@ -79,6 +82,7 @@ The same window in other cities (light's centre at local solar noon): London 3.4
 | `SeasonControl.ts` | Today \| Dec 21 \| Jun 21 next to the window |
 | `GazeDisclosure.ts` | Window / floor / elsewhere → what shows; off-view arrow and chime |
 | `SunpatchMotion.ts` | Every motion duration and curve, tweens, fades, the patch spring, reduce motion |
+| `SpotSun.ts` | Look down near your feet → the 12-month ring and `Sun here:` line for that floor spot (`global.spotSun`) |
 | `SunpatchMain.ts` | State, start rule, label, notes, and the test API (`global.sunpatch`) |
 
 ### Look and motion
@@ -87,7 +91,7 @@ The same window in other cities (light's centre at local solar noon): London 3.4
 - **Readable at 3–4 m.** Label cap height about 4.5 cm, 25 cm above the patch and turned to face you; sun clock about 5 cm, 12 cm above a 6 cm sun with a 12 cm halo and a 24 cm grab sphere; the arc line is 1.2 cm with 3 cm hour dots, a faint dashed line where the sun is behind the wall, and the visible ends marked (`13:09`, `Sunset 16:24`). The day control is three 16 × 10 cm parts at the window's centre height, 20 cm to its right, light plates (no dark plates on an additive display).
 - **Calm motion.** Arriving things ease out, leaving things ease in, things that move to a new place ease in-out. On the pin: rays, then the patch grows from the window side (400 ms), then the label (120 ms later), then the day control (350 ms, a delay only). Dragging: the patch follows on a critically damped spring (no overshoot) and the clock moves in whole minutes with a small dead band. Day change: arc and patch move together in 500 ms; a move over 1.5 m crossfades instead of sweeping. Sunset: the patch fades in place, the label crossfades. Gaze: 120 ms to show, 250 ms to hide, a 15 cm larger area on the way out. Nothing pulses; the only loop is the onboarding outline before the first pin. `reduceMotion` makes every change instant (the anti-flicker filters stay).
 
-## Tests (LEAF, 15 scenarios, all passing in the Lens Studio preview)
+## Tests (LEAF, 16 scenarios, all passing in the Lens Studio preview)
 
 | # | Scenario | What it checks | Result |
 |---|---|---|---|
@@ -106,6 +110,7 @@ The same window in other cities (light's centre at local solar noon): London 3.4
 | 13 | `sunpatch-c13-handle-reach` | Sun up but off the arc → handle waits dimmed at the nearest end and a real drag brings the light in; real hover → halo 0.45 ×1.25; arc and handle never fade while held (gaze on the floor) and 0.5 s after; the arc's end = sunset; `Sun lands beyond this room` at 16:00; clipped polygon at 15:10 | Pass — 0 frames off |
 | 14 | `sunpatch-c14-first-minute` | Onboarding hint and breathing outlines (0.15–0.35); pin order rays → patch grows from the window side → label (+132 ms) → control; pinned outline 0.35; `Drag the sun` until the first drag; honest 15:10 note for 6 s; a bad time is refused | Pass |
 | 15 | `sunpatch-c15-furniture-light` | Dec 21 noon: the light that reaches the sofa is drawn on the seat top (every point at the seat's height, inside the seat, and on a ray back through the window); the floor behind the seat is in its shadow; Jun 21 noon: nothing on the seat; Jan 21 noon light on the seat, Feb 21 none (as `tools/measure_year.ts` measures) | Pass |
+| 16 | `sunpatch-c16-stand-here` | Looking ahead: no ring; looking down near your feet gives the floor spot there (10 cm grid), looking across the room does not; a spot in the Dec 21 noon light gets December, one in the Jun 21 noon light gets June; the floor under the sofa gets `No direct sun here`; shown, the ring sits at the spot with its line and the patch label steps aside | Pass |
 
 `sunpatch-pose` is not a test: it pins a window and fixes the time for screenshots.
 
@@ -113,7 +118,7 @@ The same window in other cities (light's centre at local solar noon): London 3.4
 
 1. Open `Sunpatch.esproj` in **Lens Studio 5.23** or later (Spectacles project). The preview device is Spectacles with the empty "Plane" interactive scene.
 2. In the Preview panel, use Interactive Preview: WASD to move, Q/E down/up, right-drag to look. A mouse click is a pinch.
-3. Click the front window to pin it. Look at the window and drag the small sun (or the arc anywhere) along its path (hover it first, then press and drag). Click **Dec 21**, **Jun 21** or **Today** to the right of the window.
+3. Click the front window to pin it. Look at the window and drag the small sun (or the arc anywhere) along its path (hover it first, then press and drag). Click **Dec 21**, **Jun 21** or **Today** to the right of the window. Walk to a spot and look down at the floor near your feet to see its month ring.
 4. Tests: open the LEAF panel and run the scenarios listed above.
 
 ## Limitations

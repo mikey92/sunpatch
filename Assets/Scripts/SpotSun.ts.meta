@@ -1,0 +1,55 @@
+- !<AssetImportMetadata/53c3c78b-e419-4500-9175-1067c361a881>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 50fbc5de-8172-46ae-bff6-3e7de23facc0
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 50fbc5de-8172-46ae-bff6-3e7de23facc0
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 48a0735e-30a4-4a7a-b7ff-45ad3cc35c02
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/48a0735e-30a4-4a7a-b7ff-45ad3cc35c02>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 12f063d2-6355-4100-8887-33ed96cf6d31
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cameraObject: false
+    main: false
+    radiusCm: false
+    reachCm: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - main: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      cameraObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      radiusCm: !<float> 30.000000
+      reachCm: !<float> 90.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input AssignableType_1 main
+    - '// @input SceneObject cameraObject {"hint":"The device camera: where you stand and where you look."}'
+    - '// @input float radiusCm = 30 {"hint":"Ring radius (cm)."}'
+    - '// @input float reachCm = 90 {"hint":"Show the ring only where the gaze meets the floor this close to your head (cm, level)."}'

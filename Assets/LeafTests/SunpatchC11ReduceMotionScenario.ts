@@ -46,12 +46,15 @@ export class SunpatchC11ReduceMotionScenario extends Scenario {
       "patch fully visible at its target opacity at once")
 
     await lookAt("window", 200)
+    await nextFrame() // the arc and label read the new gaze on the next frame
     check(arc.getArcOpacity() === 1 && api.getLabelOpacity() === 0, "window: arc fully on, label fully off at once ("
       + arc.getArcOpacity() + ", " + api.getLabelOpacity() + ")")
     await lookAt("floor", 200)
+    await nextFrame() // the arc and label read the new gaze on the next frame
     check(arc.getArcOpacity() === 0 && api.getLabelOpacity() === 1, "floor: arc fully off, label fully on at once ("
       + arc.getArcOpacity() + ", " + api.getLabelOpacity() + ")")
     await lookAt("away", 350)
+    await nextFrame()
     check(arc.getArcOpacity() === 0 && api.getLabelOpacity() === 0, "elsewhere: both off at once")
     restoreLive()
     log("C11 done")

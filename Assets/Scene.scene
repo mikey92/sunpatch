@@ -921,6 +921,26 @@
     []
   Components:
     - !<own> edbe778e-fcc5-4484-a16b-743442db70f0
+- !<ScriptComponent/17c4852b-c42c-4b94-b984-67ca46cd79ba>
+  PrefabRemaps:
+    []
+  Name: SpotSun
+  Enabled: true
+  ScriptAsset: !<reference> 50fbc5de-8172-46ae-bff6-3e7de23facc0
+  ScriptInputsDefault:
+    radiusCm: true
+    reachCm: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      main: !<MappingBased.AssignableType_1> d7e65af6-bc3e-47a2-b851-b77321f39e3e
+      cameraObject: !<reference.SceneObject> 00000000-0000-0065-0000-000000000064
+      radiusCm: !<float> 30.000000
+      reachCm: !<float> 90.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/181c239f-175e-4912-94fc-d37a2599b2d6>
   PrefabRemaps:
     []
@@ -3553,6 +3573,7 @@
     - !<own> d7e65af6-bc3e-47a2-b851-b77321f39e3e
     - !<own> 10cc0f80-4541-4a03-ba22-db813f5023e6
     - !<own> f1ea8abf-3bd0-482d-b5e7-c75fdec4fa0e
+    - !<own> 17c4852b-c42c-4b94-b984-67ca46cd79ba
 - !<Text/a4272229-9434-42fd-be46-87cf87c2b3ce>
   PrefabRemaps:
     []

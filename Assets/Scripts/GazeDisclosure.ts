@@ -242,7 +242,10 @@ export class GazeDisclosure extends BaseScriptComponent {
     const place = this.main.getLabelPlace()
     const held = this.arc.isHeld()
     this.arc.setShown(this.gaze === "window")
-    this.main.setLabelShown(this.gaze === "floor" || (this.gaze === "window" && place === "window") || (held && place === "floor"))
+    // Looking down at your feet, the month ring's own line takes the place of this one.
+    const spot = (global as any).spotSun
+    const atFeet = !!(spot && spot.isShown())
+    this.main.setLabelShown(!atFeet && (this.gaze === "floor" || (this.gaze === "window" && place === "window") || (held && place === "floor")))
 
     this.updateArrow(ray.o, ray.d, now, held)
   }

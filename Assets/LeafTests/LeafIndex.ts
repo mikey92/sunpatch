@@ -15,6 +15,7 @@ import { SunpatchC12NoClaimsScenario } from "./SunpatchC12NoClaimsScenario"
 import { SunpatchC13HandleReachScenario } from "./SunpatchC13HandleReachScenario"
 import { SunpatchC14FirstMinuteScenario } from "./SunpatchC14FirstMinuteScenario"
 import { SunpatchC15FurnitureLightScenario } from "./SunpatchC15FurnitureLightScenario"
+import { SunpatchC16StandHereScenario } from "./SunpatchC16StandHereScenario"
 import { SunpatchPoseScenario } from "./SunpatchPoseScenario"
 
 @component
@@ -36,6 +37,7 @@ export class LeafIndex extends BaseScriptComponent {
     { id: "sunpatch-c13-handle-reach", typename: SunpatchC13HandleReachScenario.getTypeName() },
     { id: "sunpatch-c14-first-minute", typename: SunpatchC14FirstMinuteScenario.getTypeName() },
     { id: "sunpatch-c15-furniture-light", typename: SunpatchC15FurnitureLightScenario.getTypeName() },
+    { id: "sunpatch-c16-stand-here", typename: SunpatchC16StandHereScenario.getTypeName() },
     {
       id: "sunpatch-pose",
       typename: SunpatchPoseScenario.getTypeName(),
