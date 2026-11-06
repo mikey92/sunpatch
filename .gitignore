@@ -40,3 +40,6 @@ ls-live-instance.json.tmp
 # Added by Lens Studio (LEAF plugin)
 leaf_plugin_settings.json
 
+
+# editor tool dumps
+.virtual-scene.json

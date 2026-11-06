@@ -1,0 +1,55 @@
+- !<AssetImportMetadata/0d43bcbf-3cd3-4911-8d57-6cb2934c6565>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 87cfe67b-1730-4dfc-aea7-d6e7fccdfa36
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 87cfe67b-1730-4dfc-aea7-d6e7fccdfa36
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 0790a323-89a6-43d2-8c58-e362a836f7ce
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/0790a323-89a6-43d2-8c58-e362a836f7ce>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: c50695f6-08e4-4314-a79a-0e1000c39fd2
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    boxMesh: false
+    heightCm: false
+    highlightMaterial: false
+    widthCm: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - widthCm: !<float> 120.000000
+      heightCm: !<float> 100.000000
+      boxMesh: !<reference.RenderMesh> 00000000-0000-0000-0000-000000000000
+      highlightMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float widthCm = 120 {"hint":"Window opening width (cm)."}'
+    - '// @input float heightCm = 100 {"hint":"Window opening height (cm)."}'
+    - '// @input Asset.RenderMesh boxMesh {"hint":"Optional: unit box mesh for the aimed-at glow."}'
+    - '// @input Asset.Material highlightMaterial {"hint":"Optional: translucent material for the aimed-at glow."}'

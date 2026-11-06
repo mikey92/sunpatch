@@ -1,0 +1,58 @@
+- !<AssetImportMetadata/f073656b-a2aa-41e0-b7b6-9e57f9f23a4a>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 0b30ac71-58d2-4682-8748-6dad6d28ffb4
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 0b30ac71-58d2-4682-8748-6dad6d28ffb4
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 569133ac-3a35-401e-8c25-5f4ff9f661be
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/569133ac-3a35-401e-8c25-5f4ff9f661be>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 2476a7f8-cdf9-463f-83cc-76b513f61f71
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    fadeBelowDeg: false
+    floor: false
+    liftCm: false
+    maxAlpha: false
+    patchMaterial: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - floor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      patchMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      liftCm: !<float> 1.000000
+      maxAlpha: 0.550000
+      fadeBelowDeg: !<float> 6.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject floor {"hint":"Floor box: its top face is the floor plane, its x/z extent the room."}'
+    - '// @input Asset.Material patchMaterial {"hint":"Translucent warm gold material for the patch."}'
+    - '// @input float liftCm = 1 {"hint":"Height of the patch above the floor (cm)."}'
+    - '// @input float maxAlpha = 0.55 {"hint":"Peak opacity of the patch.", "widget":"slider", "min":0.1, "max":1, "step":0.05}'
+    - '// @input float fadeBelowDeg = 6 {"hint":"Below this sun altitude (deg) the patch fades toward the horizon."}'

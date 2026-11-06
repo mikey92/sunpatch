@@ -1,0 +1,74 @@
+- !<AssetImportMetadata/826d11a0-c70a-4e2c-8231-8cd1b39221b3>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> a4d92f73-812b-4023-8c5a-1f9b64395e51
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> a4d92f73-812b-4023-8c5a-1f9b64395e51
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c2fdbeb6-04c7-45b3-8b0c-b46480f9cfcd
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c2fdbeb6-04c7-45b3-8b0c-b46480f9cfcd>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: a7848ef7-fc2f-4952-a5f7-c52d915e850b
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cameraObject: false
+    headingSign: false
+    label: false
+    latitudeDeg: false
+    longitudeDeg: false
+    minusZAzimuthDeg: false
+    northMarker: false
+    projector: false
+    startWindow: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - projector: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      label: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      cameraObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      northMarker: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      latitudeDeg: 51.507401
+      longitudeDeg: -0.127800
+      minusZAzimuthDeg: !<float> 165.000000
+      headingSign: !<float> 1.000000
+      startWindow: ""
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - '// @input AssignableType_1 projector {"hint":"Projects the window onto the floor."}'
+    - '// @input Component.Text label {"hint":"Text for the patch / window label."}'
+    - '// @input SceneObject cameraObject {"hint":"The device camera (labels turn toward it)."}'
+    - '// @input SceneObject northMarker {"hint":"Floor marker whose local -Z is turned to point north."}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Place (preview stand-in)"}'
+    - '// @input float latitudeDeg = 51.5074 {"hint":"Latitude, degrees north. Preview: London."}'
+    - '// @input float longitudeDeg = -0.1278 {"hint":"Longitude, degrees east. Preview: London."}'
+    - '// @input float minusZAzimuthDeg = 165 {"hint":"Compass azimuth of world -Z (the way the user faces at start). Preview constant."}'
+    - '// @input float headingSign = 1 {"hint":"+1, or -1 if the heading source turns the other way (preview sign-flip constant)."}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @input string startWindow {"hint":"Window pinned at start (empty = none until the user pinches one)."}'
