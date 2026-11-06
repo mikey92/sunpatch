@@ -122,4 +122,10 @@ This part is for you, after CLAD finishes.
 - Start position: standing, eyes 160 cm above the floor (default), facing the window wall.
 
 ## Changes after review
-- (none yet)
+- First build (2026-11-05), core only: room, three pinchable windows (south-ish 165°, WSW 255° on the right wall, NNW 345° on the back wall), NOAA sun position, the floor patch, the label, the north marker and the preview note. Sun arc, sun handle, season button (UI Kit), gaze disclosure, rays, off-view arrow and chime are not built yet; the season change exists in the test API only.
+- Season keeps the clock time, not the UTC instant: "12:00 · Jun 21" is 12:00 BST (11:00 UTC), so the Jun 21 patch sits slightly east of straight-in. Times are UK civil time (GMT/BST).
+- Label wording beyond the design: before sunrise the label says "Sun not up yet / Sunrise 07:02" (after solar noon it is "Sun has set / Sunset 16:24"); if all the light lands beyond the room's walls it says "Sun lands beyond this room". "No direct sun" also shows the clock.
+- The date tag says "today" only when the London date is today; otherwise the date ("15:10 · Nov 5").
+- The patch is clipped to the room's floor rectangle (light that would land past a wall is dropped; walls are out of scope).
+- Preview environment set to Lens Studio's empty "Plane" scene, so the built room is not mixed with the default living room's furniture.
+- Open question: with the window wall at 165°, at 15:10 on Nov 5 the sun (azimuth 230°, altitude 9°) sends the light mostly past the left (west) wall, so the design's opening shot shows only a thin strip. Either the wall should face closer to 200° (SSW) or the opening shot should use an earlier hour. Not decided yet.
