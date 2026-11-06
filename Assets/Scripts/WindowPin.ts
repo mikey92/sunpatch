@@ -9,6 +9,9 @@
  *
  * While aimed at, a faint warm outline glow shows on the window (if a highlight material and
  * box mesh are given), so the target highlights when aimed at.
+ *
+ * The pinned window stops being a pinch target (its collider is switched off) so that the sun
+ * handle, seen through that window, can be grabbed; the other windows stay pinchable.
  */
 import { Interactable } from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 
@@ -51,6 +54,7 @@ export class WindowPin extends BaseScriptComponent {
 
   private static listeners: PinListener[] = []
   private static registry: WindowPin[] = []
+  private static current: WindowPin | null = null
 
   private interactable: Interactable | null = null
   private collider: ColliderComponent | null = null
@@ -104,7 +108,20 @@ export class WindowPin extends BaseScriptComponent {
 
   /** Pins this window (same path as a real pinch). */
   pin(): void {
+    WindowPin.current = this
+    for (const w of WindowPin.registry) w.setTargetable(w !== this)
     for (const fn of WindowPin.listeners) fn(this)
+  }
+
+  /** The pinned window, or null. */
+  static pinned(): WindowPin | null {
+    return WindowPin.current
+  }
+
+  private setTargetable(on: boolean): void {
+    if (this.collider) this.collider.enabled = on
+    if (this.interactable) this.interactable.enabled = on
+    if (!on && this.glow) this.glow.enabled = false
   }
 
   getGeometry(): WindowGeometry {

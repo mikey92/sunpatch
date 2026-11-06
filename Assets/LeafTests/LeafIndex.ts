@@ -6,6 +6,12 @@ import { SunpatchC3SunSetScenario } from "./SunpatchC3SunSetScenario"
 import { SunpatchC4SeasonReachScenario } from "./SunpatchC4SeasonReachScenario"
 import { SunpatchC5PatchGeometryScenario } from "./SunpatchC5PatchGeometryScenario"
 import { SunpatchC6NorthWindowScenario } from "./SunpatchC6NorthWindowScenario"
+import { SunpatchC7HandleDragScenario } from "./SunpatchC7HandleDragScenario"
+import { SunpatchC8SeasonButtonRepinScenario } from "./SunpatchC8SeasonButtonRepinScenario"
+import { SunpatchC9OffViewArrowScenario } from "./SunpatchC9OffViewArrowScenario"
+import { SunpatchC10GazeSwitchScenario } from "./SunpatchC10GazeSwitchScenario"
+import { SunpatchC11ReduceMotionScenario } from "./SunpatchC11ReduceMotionScenario"
+import { SunpatchC12NoClaimsScenario } from "./SunpatchC12NoClaimsScenario"
 import { SunpatchPoseScenario } from "./SunpatchPoseScenario"
 
 @component
@@ -18,6 +24,12 @@ export class LeafIndex extends BaseScriptComponent {
     { id: "sunpatch-c4-season-reach", typename: SunpatchC4SeasonReachScenario.getTypeName() },
     { id: "sunpatch-c5-patch-geometry", typename: SunpatchC5PatchGeometryScenario.getTypeName() },
     { id: "sunpatch-c6-north-window", typename: SunpatchC6NorthWindowScenario.getTypeName() },
+    { id: "sunpatch-c7-handle-drag", typename: SunpatchC7HandleDragScenario.getTypeName() },
+    { id: "sunpatch-c8-season-button-repin", typename: SunpatchC8SeasonButtonRepinScenario.getTypeName() },
+    { id: "sunpatch-c9-off-view-arrow", typename: SunpatchC9OffViewArrowScenario.getTypeName() },
+    { id: "sunpatch-c10-gaze-switch", typename: SunpatchC10GazeSwitchScenario.getTypeName() },
+    { id: "sunpatch-c11-reduce-motion", typename: SunpatchC11ReduceMotionScenario.getTypeName() },
+    { id: "sunpatch-c12-no-claims", typename: SunpatchC12NoClaimsScenario.getTypeName() },
     {
       id: "sunpatch-pose",
       typename: SunpatchPoseScenario.getTypeName(),

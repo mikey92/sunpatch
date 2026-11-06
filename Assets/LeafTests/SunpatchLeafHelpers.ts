@@ -49,6 +49,10 @@ export function fmt(v: vec3): string {
 
 /** Real SIK trigger on a window's Interactable (the pinch), then waits until it is pinned. */
 export async function pinchWindow(name: string): Promise<void> {
+  if (sp().getPinnedWindowName() === name) {
+    log(name + " is already pinned (a pinned window is not a pinch target)")
+    return
+  }
   const it = findInteractablesByName(name, undefined, true)[0]
   if (!it) throw new Error(TAG + " enabled Interactable not found: " + name)
   log("real trigger " + name + " (pinch the window)")

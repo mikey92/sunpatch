@@ -318,6 +318,16 @@ export class SunpatchMain extends BaseScriptComponent {
     return this.projector.getAlpha()
   }
 
+  /** Largest distance (cm) between the drawn patch and where it is going (0 when settled). */
+  getPatchGlideError(): number {
+    return this.projector.getGlideError()
+  }
+
+  /** Opacity the patch is fading toward. */
+  getPatchTargetAlpha(): number {
+    return this.projector.getTargetAlpha()
+  }
+
   getLabel(): string {
     return this.labelText
   }

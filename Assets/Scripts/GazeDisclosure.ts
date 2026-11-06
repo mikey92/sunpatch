@@ -88,7 +88,7 @@ export class GazeDisclosure extends BaseScriptComponent {
     this.arrowObj = global.scene.createSceneObject("OffViewArrow")
     this.arrowObj.setParent(this.cameraObject)
     const rmv = this.arrowObj.createComponent("Component.RenderMeshVisual") as RenderMeshVisual
-    rmv.mesh = buildChevron(1.6)
+    rmv.mesh = buildChevron(1.2)
     this.arrowMat = this.overlayMaterial.clone()
     this.arrowMat.mainPass.baseColor = new vec4(1, 0.84, 0.4, 0)
     rmv.mainMaterial = this.arrowMat
@@ -198,7 +198,10 @@ export class GazeDisclosure extends BaseScriptComponent {
     const pinned = this.main.getPinnedWindow()
     const visible = this.main.isPatchVisible()
     const key = (pinned ? pinned.getSceneObject().name : "-") + "|" + this.main.getSeason()
-    if (key !== this.chimeKey) this.chimeKey = key
+    if (key !== this.chimeKey) {
+      this.chimeKey = key
+      this.chimedFor = ""
+    }
 
     let wanted = false
     let dir2 = new vec2(0, -1)
@@ -210,14 +213,25 @@ export class GazeDisclosure extends BaseScriptComponent {
       if (right.length < 1e-3) right = vec3.right()
       right = right.normalize()
       const up = right.cross(fwd).normalize()
+      const tanV = Math.tan(this.cam.fov / 2)
+      const tanH = tanV * this.cam.aspect
+      const f = this.inViewFraction
+      const inView = (p: vec3): boolean => {
+        const r = p.sub(o)
+        const zz = r.dot(fwd)
+        return zz > 1 && Math.abs(r.dot(right) / zz) <= tanH * f && Math.abs(r.dot(up) / zz) <= tanV * f
+      }
+      // In view if its center, or a point a quarter of the way in from any corner, is in view.
+      let seen = inView(center)
+      for (const p of this.projector.getLast().polygon) {
+        if (seen) break
+        seen = inView(p.add(center.sub(p).uniformScale(0.25)))
+      }
+      this.patchInView = seen
       const rel = center.sub(o)
       const z = rel.dot(fwd)
       const x = rel.dot(right)
       const y = rel.dot(up)
-      const tanV = Math.tan(this.cam.fov / 2)
-      const tanH = tanV * this.cam.aspect
-      const f = this.inViewFraction
-      this.patchInView = z > 1 && Math.abs(x / z) <= tanH * f && Math.abs(y / z) <= tanV * f
       wanted = !this.patchInView
       if (wanted) {
         const len = Math.sqrt(x * x + y * y)
@@ -242,7 +256,7 @@ export class GazeDisclosure extends BaseScriptComponent {
       this.arrowAlpha += (target - this.arrowAlpha) * k
       if (Math.abs(target - this.arrowAlpha) < 0.01) this.arrowAlpha = target
     }
-    this.arrowMat.mainPass.baseColor = new vec4(1, 0.84, 0.4, 0.9 * this.arrowAlpha)
+    this.arrowMat.mainPass.baseColor = new vec4(1, 0.84, 0.4, 0.8 * this.arrowAlpha)
     this.arrowObj.enabled = this.arrowAlpha > 0.001
     if (!this.arrowObj.enabled || !this.cam) return
     if (wanted) {
