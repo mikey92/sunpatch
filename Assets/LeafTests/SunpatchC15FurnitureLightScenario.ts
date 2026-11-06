@@ -6,6 +6,7 @@
  *  b. The floor behind the seat is in its shadow: the shadow rectangle is the seat top moved down
  *     along the light to the floor.
  *  c. Jun 21 at noon the high sun stays by the window: nothing on the seat.
+ *  d. Matches tools/measure_year.ts: light on the seat on Jan 21 at noon, none on Feb 21 at noon.
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { sleep } from "Leaf.lspkg/Utils/common/Utils"
@@ -57,6 +58,15 @@ export class SunpatchC15FurnitureLightScenario extends Scenario {
     await sleep(200)
     await waitFor(() => proj.getFurniturePolygon().length === 0, 3000, "no light on the seat on Jun 21 at noon")
     check(proj.getFurniturePolygon().length === 0, "Jun 21 at noon: no light on the seat")
+    // d. The year at this window (tools/measure_year.ts): the seat gets direct sun only from late
+    //    November to late January. Jan 21 noon: light on the seat; Feb 21 noon: none.
+    api.setSeason("today")
+    api.setUtc("2027-01-21T12:00:00Z")
+    await waitFor(() => proj.getFurniturePolygon().length >= 3, 3000, "light on the seat on Jan 21 at noon")
+    check(proj.getFurniturePolygon().length >= 3, "Jan 21 at noon: light on the seat")
+    api.setUtc("2027-02-21T12:00:00Z")
+    await waitFor(() => proj.getFurniturePolygon().length === 0, 3000, "no light on the seat on Feb 21 at noon")
+    check(proj.getFurniturePolygon().length === 0, "Feb 21 at noon: no light on the seat")
     restoreLive()
     log("C15 done")
   }

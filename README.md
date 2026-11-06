@@ -45,6 +45,22 @@ Lens Studio's preview cannot change location, has no compass and cannot scan a r
 
 The three windows face 200° (front), 290° (right) and 20° (back), so one window catches the afternoon sun, one catches the evening, and one gets no direct sun at noon.
 
+## A year at this window (measured with the Lens's own code)
+
+`node tools/measure_year.ts` runs the Lens's `SolarPosition.ts` with the same window, room, sofa and north as the preview scene. It first reproduces LEAF criterion 4 exactly (Dec 21 noon light 345.2 cm into the room, Jun 21 noon 38.3 cm), then measures every minute of the 21st of each month:
+
+| | Direct sun on the floor | On the sofa seat | Deepest reach |
+|---|---|---|---|
+| Nov 21 | 08:46–15:21 | 10:26–13:49 (204 min) | 5.5 m (back wall) |
+| Dec 21 | 09:24–15:05 | 10:34–14:06 (213 min) | 5.5 m |
+| Jan 21 | 09:11–15:48 | 10:52–14:14 (203 min) | 5.5 m |
+| Feb 21 – Oct 21 | every month | none | 1.0–5.1 m |
+| Jun 21 | 09:57–19:25 | none | 1.0 m |
+
+So in this room the sofa gets direct sun only from late November to late January, around midday, and never from February to October. That is the answer a 15-minute viewing in November can't give by looking, and the one Sunpatch draws. LEAF criterion 15 checks the same edge in the Lens: light on the seat on Jan 21 at noon, none on Feb 21.
+
+The same window in other cities (light's centre at local solar noon): London 3.44 m in on Dec 21 and 0.50 m on Jun 21; Seoul 1.68 m / 0.23 m; San Diego 1.38 m / 0.15 m; Oslo 4.81 m / 0.69 m. On glasses the location is the device's, so the patch is drawn for wherever you stand.
+
 ## How it was made
 
 - **Design brief** from the Devpost *Learn AR with SPECS* skill pack (`plan-lens` interview → `devpost/design-brief.md`).
@@ -89,7 +105,7 @@ The three windows face 200° (front), 290° (right) and 20° (back), so one wind
 | 12 | `sunpatch-c12-no-claims` | 3 windows × 3 days × 24 hours: no judgement words, no numbers other than clock times and dates; the scene walk finds the Lens's texts from the objects, not by name | Pass — 1,915 texts |
 | 13 | `sunpatch-c13-handle-reach` | Sun up but off the arc → handle waits dimmed at the nearest end and a real drag brings the light in; real hover → halo 0.45 ×1.25; arc and handle never fade while held (gaze on the floor) and 0.5 s after; the arc's end = sunset; `Sun lands beyond this room` at 16:00; clipped polygon at 15:10 | Pass — 0 frames off |
 | 14 | `sunpatch-c14-first-minute` | Onboarding hint and breathing outlines (0.15–0.35); pin order rays → patch grows from the window side → label (+132 ms) → control; pinned outline 0.35; `Drag the sun` until the first drag; honest 15:10 note for 6 s; a bad time is refused | Pass |
-| 15 | `sunpatch-c15-furniture-light` | Dec 21 noon: the light that reaches the sofa is drawn on the seat top (every point at the seat's height, inside the seat, and on a ray back through the window); the floor behind the seat is in its shadow; Jun 21 noon: nothing on the seat | Pass |
+| 15 | `sunpatch-c15-furniture-light` | Dec 21 noon: the light that reaches the sofa is drawn on the seat top (every point at the seat's height, inside the seat, and on a ray back through the window); the floor behind the seat is in its shadow; Jun 21 noon: nothing on the seat; Jan 21 noon light on the seat, Feb 21 none (as `tools/measure_year.ts` measures) | Pass |
 
 `sunpatch-pose` is not a test: it pins a window and fixes the time for screenshots.
 
