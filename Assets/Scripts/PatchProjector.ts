@@ -227,11 +227,20 @@ export class PatchProjector extends BaseScriptComponent {
    */
   floorShadowRect(): number[] | null {
     const r = this.furnitureTopRect()
-    if (!r || Math.abs(this.light.y) < 1e-4) return null
-    const k = (this.getPatchPlaneY() - r[0]) / this.light.y
-    const dx = this.light.x * k
-    const dz = this.light.z * k
+    if (!r) return null
+    const L = this.drawnLight()
+    if (!L || Math.abs(L.y) < 1e-4) return null
+    const k = (this.getPatchPlaneY() - r[0]) / L.y
+    const dx = L.x * k
+    const dz = L.z * k
     return [r[1] + dx, r[2] + dx, r[3] + dz, r[4] + dz]
+  }
+
+  /** Light direction of the patch as drawn (window corner 0 -> drawn floor corner 0). */
+  private drawnLight(): vec3 | null {
+    if (!this.win || this.pos.length !== 4) return null
+    const d = this.pos[0].sub(this.win.corners[0])
+    return d.length > 1e-3 ? d.normalize() : null
   }
 
   /** Drawn polygon of the light on the furniture top (world), empty if none. */
@@ -464,6 +473,7 @@ export class PatchProjector extends BaseScriptComponent {
       this.level = this.levelTarget
       this.color = this.colorTarget
       this.vis.start(1, MotionMs.patchCrossIn, easeOut)
+      this.dirty = true
       moving = true
     } else if (!this.crossPending && this.target.length === 4 && this.pos.length === 4) {
       if (this.glideT0 >= 0) {
@@ -591,9 +601,15 @@ export class PatchProjector extends BaseScriptComponent {
     this.topPoly = []
     if (!this.topObj || !this.topRmv || !this.topMb) return
     const r = this.furnitureTopRect()
-    if (!r || corners.length !== 4 || Math.abs(this.light.y) < 1e-4) { this.topRmv.enabled = false; return }
-    const L = this.light
-    const onTop = corners.map((c) => c.add(L.uniformScale((r[0] - c.y) / L.y)))
+    if (!r || corners.length !== 4 || !this.win) { this.topRmv.enabled = false; return }
+    // Each drawn floor corner and its window corner are on one ray: stop that ray at the top's
+    // height. Using the drawn corners keeps the seat light in step with the floor patch while it
+    // moves, glides or crossfades.
+    const w = this.win.corners
+    const onTop = corners.map((c, i) => {
+      const k = (r[0] - c.y) / (w[i].y - c.y)
+      return c.add(w[i].sub(c).uniformScale(k))
+    })
     const poly = clipToRect(onTop, r[1], r[2], r[3], r[4])
     if (poly.length < 3) { this.topRmv.enabled = false; return }
     const inv = this.topObj.getTransform().getInvertedWorldTransform()

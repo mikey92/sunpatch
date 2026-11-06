@@ -7,6 +7,7 @@
  *     along the light to the floor.
  *  c. Jun 21 at noon the high sun stays by the window: nothing on the seat.
  *  d. Matches tools/measure_year.ts: light on the seat on Jan 21 at noon, none on Feb 21 at noon.
+ *  e. With motion on, the seat light follows the drawn patch through a crossfaded day change.
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { sleep } from "Leaf.lspkg/Utils/common/Utils"
@@ -67,6 +68,18 @@ export class SunpatchC15FurnitureLightScenario extends Scenario {
     api.setUtc("2027-02-21T12:00:00Z")
     await waitFor(() => proj.getFurniturePolygon().length === 0, 3000, "no light on the seat on Feb 21 at noon")
     check(proj.getFurniturePolygon().length === 0, "Feb 21 at noon: no light on the seat")
+    // e. With motion on (the day change crossfades a big move), the seat light follows the drawn
+    //    patch: after Today -> Dec 21 it is on the seat, after -> Jun 21 it is gone.
+    api.setReduceMotion(false)
+    api.setSeason("today")
+    api.setUtc("2026-11-06T12:35:00Z")
+    await sleep(1500)
+    api.setSeason("dec21")
+    await waitFor(() => proj.getFurniturePolygon().length >= 3, 4000, "seat light after a crossfaded day change to Dec 21")
+    check(proj.getFurniturePolygon().length >= 3, "motion on, Dec 21: light on the seat")
+    api.setSeason("jun21")
+    await waitFor(() => proj.getFurniturePolygon().length === 0, 4000, "no seat light after the change to Jun 21")
+    check(proj.getFurniturePolygon().length === 0, "motion on, Jun 21: no light on the seat")
     restoreLive()
     log("C15 done")
   }
