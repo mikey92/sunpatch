@@ -29,6 +29,8 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     cameraObject: false
+    demoHour: false
+    demoMinute: false
     headingSign: false
     label: false
     latitudeDeg: false
@@ -36,6 +38,9 @@
     minusZAzimuthDeg: false
     northMarker: false
     projector: false
+    reduceMotion: false
+    startSeason: false
+    startUtc: false
     startWindow: false
   ScriptTypesHidden:
     {}
@@ -55,6 +60,11 @@
       minusZAzimuthDeg: !<float> 165.000000
       headingSign: !<float> 1.000000
       startWindow: ""
+      demoHour: !<float> 15.000000
+      demoMinute: !<float> 10.000000
+      reduceMotion: false
+      startUtc: ""
+      startSeason: today
   ScriptTypes:
     -
       {}
@@ -68,7 +78,12 @@
     - '// @ui {"widget":"group_start", "label":"Place (preview stand-in)"}'
     - '// @input float latitudeDeg = 51.5074 {"hint":"Latitude, degrees north. Preview: London."}'
     - '// @input float longitudeDeg = -0.1278 {"hint":"Longitude, degrees east. Preview: London."}'
-    - '// @input float minusZAzimuthDeg = 165 {"hint":"Compass azimuth of world -Z (the way the user faces at start). Preview constant."}'
+    - '// @input float minusZAzimuthDeg = 200 {"hint":"Compass azimuth of world -Z (the way the user faces at start). Preview constant."}'
     - '// @input float headingSign = 1 {"hint":"+1, or -1 if the heading source turns the other way (preview sign-flip constant)."}'
     - '// @ui {"widget":"group_end"}'
     - '// @input string startWindow {"hint":"Window pinned at start (empty = none until the user pinches one)."}'
+    - '// @input float demoHour = 15 {"hint":"If the sun is down now at the place, start at this clock time today (HH, MM)."}'
+    - // @input float demoMinute = 10
+    - '// @input bool reduceMotion {"hint":"Calmer: no glides or fades, everything switches at once."}'
+    - '// @input string startUtc {"hint":"Optional fixed start instant (ISO, e.g. 2026-11-06T15:10:00Z) for demos; empty = start rule."}'
+    - '// @input string startSeason = "today" {"hint":"Season at start: today, dec21 or jun21."}'

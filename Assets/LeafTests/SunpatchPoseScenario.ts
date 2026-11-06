@@ -1,7 +1,7 @@
 /**
  * Not a test — a helper for screenshots and the demo video. Pins a window with a real pinch and
  * fixes the time and season, then leaves the Lens in that state.
- * Parameters: window (scene object name), utc (ISO time, or "now"), season (today | dec21 | jun21).
+ * Parameters: window (scene object name), utc (ISO time, or "now" = the start rule), season (today | dec21 | jun21).
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { ScenarioConfig } from "Leaf.lspkg/Scenarios/scenario/ScenarioConfig"
@@ -16,7 +16,7 @@ export class SunpatchPoseScenario extends Scenario {
     const utc = (config && config.get("utc")) || "now"
     const season = (config && config.get("season")) || "today"
     await pinchWindow(win)
-    if (utc === "now") api.useNow()
+    if (utc === "now") api.useDemoDefault()
     else api.setUtc(utc)
     api.setSeason(season)
     log("pose: " + win + ", " + api.getLocalClock() + " " + season + ", state " + api.getPatchState()

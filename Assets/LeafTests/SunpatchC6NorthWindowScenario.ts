@@ -1,10 +1,10 @@
 /**
  * Done criterion 6 — north window at noon: no patch, label "No direct sun".
- * The north-facing window (faces 345 deg) is pinned with a real pinch at London 2026-11-05 12:00.
+ * The back window (faces 20 deg, NNE, since the room's front wall faces 200 deg) is pinned with a real pinch at London 2026-11-05 12:00.
  * Then the south window is pinched again and the patch comes back (re-pin).
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
-import { check, log, pinchWindow, restoreLive, sp, waitFor, waitForLensUp } from "./SunpatchLeafHelpers"
+import { check, log, lookAt, pinchWindow, restoreLive, sp, waitFor, waitForLensUp } from "./SunpatchLeafHelpers"
 
 @component
 export class SunpatchC6NorthWindowScenario extends Scenario {
@@ -14,6 +14,7 @@ export class SunpatchC6NorthWindowScenario extends Scenario {
     api.setSeason("today")
     api.setUtc("2026-11-05T12:00:00Z")
     await pinchWindow("WindowNorth")
+    await lookAt("window")
     const s = api.getSunAltAz()
     log("north window, sun alt " + s.altitude.toFixed(2) + " az " + s.azimuth.toFixed(2)
       + ": state " + api.getPatchState() + ", label \"" + api.getLabel().replace("\n", " / ") + "\"")

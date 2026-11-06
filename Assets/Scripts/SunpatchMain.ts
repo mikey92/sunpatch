@@ -10,11 +10,21 @@
  *
  * Times are shown in the place's civil time (preview: UK time, GMT/BST).
  *
+ * Start time: the real current time. If the sun is down at the place right now (the preview is
+ * London, often night when the Lens is opened elsewhere), the Lens starts at 15:10 today
+ * (London date) instead, so the first look shows light; the label always shows the real date and
+ * clock it is computing for.
+ *
+ * The label is shown only when the gaze asks for it (GazeDisclosure calls setLabelShown); it
+ * fades in/out in about 200 ms, or switches at once with reduceMotion.
+ *
  * Test API (also published as global.sunpatch): pinWindow, getPinnedWindowName, setTime,
  * setUtc, setDate, useNow, setSeason, cycleSeason, getSeason, getSunAltAz, getTowardSun,
  * getPatchState, getPatchCorners, getPatchPolygon, isPatchVisible, getPatchAlpha, getLabel,
  * isLabelVisible, getWindowCorners, getPatchPlaneY, getUtcMs, getLocalClock, getSunTimes,
- * getNorthFrame.
+ * getNorthFrame, useDemoDefault, setReduceMotion, getReduceMotion, setLabelShown,
+ * isLabelAvailable, getLabelPlace, getLabelOpacity, setClockMinutes, getClockMinutes, getDayInfo,
+ * towardSunAt.
  */
 import { formatClock, solarPosition, sunTimes, SunPosition, ukOffsetMinutes } from "./SolarPosition"
 import { NorthFrame, towardSun, yawFacingAzimuth } from "./SunFrame"
@@ -59,7 +69,7 @@ export class SunpatchMain extends BaseScriptComponent {
 
   @input
   @hint("Compass azimuth of world -Z (the way the user faces at start). Preview constant.")
-  minusZAzimuthDeg: number = 165
+  minusZAzimuthDeg: number = 200
 
   @input
   @hint("+1, or -1 if the heading source turns the other way (preview sign-flip constant).")
@@ -70,6 +80,25 @@ export class SunpatchMain extends BaseScriptComponent {
   @hint("Window pinned at start (empty = none until the user pinches one).")
   startWindow: string = ""
 
+  @input
+  @hint("If the sun is down now at the place, start at this clock time today (HH, MM).")
+  demoHour: number = 15
+
+  @input
+  demoMinute: number = 10
+
+  @input
+  @hint("Calmer: no glides or fades, everything switches at once.")
+  reduceMotion: boolean = false
+
+  @input
+  @hint("Optional fixed start instant (ISO, e.g. 2026-11-06T15:10:00Z) for demos; empty = start rule.")
+  startUtc: string = ""
+
+  @input
+  @hint("Season at start: today, dec21 or jun21.")
+  startSeason: string = "today"
+
   private pinned: WindowPin | null = null
   private fixedUtcMs: number | null = null
   private season: Season = "today"
@@ -79,6 +108,9 @@ export class SunpatchMain extends BaseScriptComponent {
   private lastKey: string = ""
   private labelText: string = ""
   private labelVisible: boolean = false
+  private labelShown: boolean = true
+  private labelAlpha: number = 0
+  private labelBase: vec4 = new vec4(1, 1, 1, 1)
 
   onAwake(): void {
     if (!this.projector || !this.label || !this.cameraObject) {
@@ -87,6 +119,8 @@ export class SunpatchMain extends BaseScriptComponent {
     }
     ;(global as any).sunpatch = this
     this.label.getSceneObject().enabled = false
+    this.labelBase = this.label.textFill.color
+    this.projector.reduceMotion = this.reduceMotion
     WindowPin.onPinned((w) => this.onWindowPinned(w))
     this.createEvent("OnStartEvent").bind(() => this.onStart())
     this.createEvent("UpdateEvent").bind(() => this.refresh(false))
@@ -94,6 +128,9 @@ export class SunpatchMain extends BaseScriptComponent {
 
   private onStart(): void {
     this.placeNorthMarker()
+    this.useDemoDefault()
+    if (this.startUtc) this.setUtc(this.startUtc)
+    if (this.startSeason === "dec21" || this.startSeason === "jun21") this.setSeason(this.startSeason)
     if (this.startWindow) this.pinWindow(this.startWindow)
     this.refresh(true)
   }
@@ -141,6 +178,98 @@ export class SunpatchMain extends BaseScriptComponent {
   useNow(): void {
     this.fixedUtcMs = null
     this.refresh(true)
+  }
+
+  /**
+   * The start rule: real current time, but if the sun is down at the place now, 15:10 today
+   * (place's date). Season back to Today. Returns true if the 15:10 fallback was used.
+   */
+  useDemoDefault(): boolean {
+    this.season = "today"
+    this.fixedUtcMs = null
+    const now = Date.now()
+    const s = solarPosition(this.latitudeDeg, this.longitudeDeg, now)
+    if (s.altitudeDeg > 0) {
+      this.refresh(true)
+      return false
+    }
+    this.setTime(this.demoHour, this.demoMinute)
+    return true
+  }
+
+  /** Calmer motion: glides and fades become instant. */
+  setReduceMotion(on: boolean): void {
+    this.reduceMotion = on
+    this.projector.reduceMotion = on
+    if (on) this.labelAlpha = this.labelTarget()
+  }
+
+  getReduceMotion(): boolean {
+    return this.reduceMotion
+  }
+
+  /** Called by GazeDisclosure: whether the user is looking where the label belongs. */
+  setLabelShown(on: boolean): void {
+    this.labelShown = on
+    if (this.reduceMotion) this.labelAlpha = this.labelTarget()
+  }
+
+  /** The label has something to say (independent of gaze). */
+  isLabelAvailable(): boolean {
+    return this.labelVisible
+  }
+
+  /** Where the label sits: "floor" (above the patch), "window", or "" (none). */
+  getLabelPlace(): string {
+    if (!this.labelVisible) return ""
+    const r = this.projector.getLast()
+    return r.state === "lit" && r.polygon.length >= 3 ? "floor" : "window"
+  }
+
+  /** Current label opacity, 0..1. */
+  getLabelOpacity(): number {
+    return this.labelAlpha
+  }
+
+  /** Sets the clock (minutes after local midnight, fractional ok) on the current date. */
+  setClockMinutes(min: number): void {
+    const h = Math.floor(min / 60)
+    this.setTime(h, min - h * 60)
+  }
+
+  /** Local clock of the computed instant, in minutes after midnight. */
+  getClockMinutes(): number {
+    const off = this.offsetMin(this.utcMs)
+    const local = ((this.utcMs + off * MS_MIN) % MS_DAY + MS_DAY) % MS_DAY
+    return local / MS_MIN
+  }
+
+  /**
+   * The computed day: sunrise / sunset / solar noon (UTC ms, NaN if none), local midnight (UTC ms)
+   * and a key that changes when the day or season changes.
+   */
+  getDayInfo(): { sunriseMs: number, sunsetMs: number, noonMs: number, midnightUtcMs: number, key: string } {
+    const t = sunTimes(this.latitudeDeg, this.longitudeDeg, this.localDayUtcAnchor())
+    const off = this.offsetMin(this.utcMs)
+    const localDay = Math.floor((this.utcMs + off * MS_MIN) / MS_DAY) * MS_DAY
+    return { sunriseMs: t.sunriseMs, sunsetMs: t.sunsetMs, noonMs: t.solarNoonMs,
+      midnightUtcMs: this.localToUtc(localDay), key: this.season + "|" + localDay }
+  }
+
+  /** Unit vector toward the sun at a UTC instant, with its altitude. */
+  towardSunAt(utcMs: number): { dir: vec3, altitude: number } {
+    const s = solarPosition(this.latitudeDeg, this.longitudeDeg, utcMs)
+    return { dir: towardSun(s.azimuthDeg, s.altitudeDeg, this.getNorthFrame()), altitude: s.altitudeDeg }
+  }
+
+  /** Clock "HH:MM" (place's civil time) of a UTC instant. */
+  clockOf(utcMs: number): string {
+    return formatClock(utcMs, this.offsetMin(utcMs))
+  }
+
+  /** The window currently pinned (null if none). */
+  getPinnedWindow(): WindowPin | null {
+    return this.pinned
   }
 
   setSeason(s: Season): void {
@@ -193,8 +322,9 @@ export class SunpatchMain extends BaseScriptComponent {
     return this.labelText
   }
 
+  /** The label is on screen: it has something to say and the gaze is where it belongs. */
   isLabelVisible(): boolean {
-    return this.labelVisible
+    return this.labelVisible && this.labelShown
   }
 
   getWindowCorners(): vec3[] {
@@ -308,13 +438,27 @@ export class SunpatchMain extends BaseScriptComponent {
     this.label.text = this.labelText
   }
 
+  private labelTarget(): number {
+    return this.labelVisible && this.labelShown ? 1 : 0
+  }
+
   /** Label 10 cm above the patch, or in front of the window; turned toward the camera (yaw only). */
   private placeLabel(): void {
     const r = this.projector.getLast()
     const so = this.label.getSceneObject()
     this.labelVisible = r.state !== "none" && this.labelText.length > 0
-    so.enabled = this.labelVisible
-    if (!this.labelVisible || !this.pinned) return
+    const target = this.labelTarget()
+    if (this.reduceMotion) {
+      this.labelAlpha = target
+    } else {
+      const k = 1 - Math.exp(-Math.min(0.1, getDeltaTime()) / 0.07)
+      this.labelAlpha += (target - this.labelAlpha) * k
+      if (Math.abs(target - this.labelAlpha) < 0.01) this.labelAlpha = target
+    }
+    const b = this.labelBase
+    this.label.textFill.color = new vec4(b.x, b.y, b.z, b.w * this.labelAlpha)
+    so.enabled = this.labelVisible && this.labelAlpha > 0.001
+    if (!so.enabled || !this.pinned) return
     let pos: vec3
     if (r.state === "lit" && r.polygon.length >= 3) {
       pos = r.center.add(new vec3(0, 10, 0))

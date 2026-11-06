@@ -1,0 +1,70 @@
+- !<AssetImportMetadata/29d9f8c9-1598-45cd-92a8-31f82ead5765>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 02a86568-a8f8-4199-a0c5-c90814892e47
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 02a86568-a8f8-4199-a0c5-c90814892e47
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 45ec368b-c584-457e-b0f8-dd0e48c82fea
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/45ec368b-c584-457e-b0f8-dd0e48c82fea>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 3968740b-522a-4ad7-b2e7-d8d14c03034f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    arc: false
+    cameraObject: false
+    chime: false
+    dwellSec: false
+    inViewFraction: false
+    main: false
+    overlayMaterial: false
+    projector: false
+    windowMargin: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - main: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      arc: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      projector: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      cameraObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      overlayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      chime: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      windowMargin: !<Vec3> {x: 80.000000, y: 50.000000, z: 140.000000}
+      dwellSec: 0.150000
+      inViewFraction: 0.850000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input AssignableType_1 main
+    - // @input AssignableType_2 arc
+    - // @input AssignableType_3 projector
+    - '// @input SceneObject cameraObject {"hint":"Camera object (gaze = its forward ray)."}'
+    - '// @input Asset.Material overlayMaterial {"hint":"Material that ignores depth, for the edge arrow."}'
+    - '// @input Asset.AudioTrackAsset chime {"hint":"Soft chime played once when the patch first goes out of view."}'
+    - '// @input vec3 windowMargin = {80,50,140} {"hint":"Extra margin around the window that still counts as looking at it (cm): sides, below, above."}'
+    - '// @input float dwellSec = 0.15 {"hint":"Seconds a new gaze class must hold before it switches."}'
+    - "// @input float inViewFraction = 0.85 {\"hint\":\"Fraction of the half field of view that counts as 'in view' for the patch.\"}"
