@@ -5,7 +5,7 @@
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { ScenarioConfig } from "Leaf.lspkg/Scenarios/scenario/ScenarioConfig"
-import { log, pinchWindow, sp, waitForLensUp } from "./SunpatchLeafHelpers"
+import { fmt, log, pinchWindow, sp, waitForLensUp } from "./SunpatchLeafHelpers"
 
 @component
 export class SunpatchPoseScenario extends Scenario {
@@ -21,5 +21,7 @@ export class SunpatchPoseScenario extends Scenario {
     api.setSeason(season)
     log("pose: " + win + ", " + api.getLocalClock() + " " + season + ", state " + api.getPatchState()
       + ", label \"" + api.getLabel().replace("\n", " / ") + "\"")
+    const arc = (global as any).sunArc
+    if (arc) log("pose: sun handle at " + fmt(arc.getHandleWorld()) + ", patch polygon " + api.getPatchPolygon().map((p: vec3) => fmt(p)).join(" "))
   }
 }

@@ -69,7 +69,7 @@
     - '// @input SceneObject seasonButton {"hint":"UI Kit button for the season (RectangleButton)."}'
     - '// @input Component.Text seasonText {"hint":"Text inside the season button."}'
     - '// @input Component.Text handleLabel {"hint":"Small clock readout above the handle."}'
-    - '// @input float radiusCm = 170 {"hint":"Distance of the arc from the window center (cm). Outside the window, 1-3 m."}'
+    - '// @input float radiusCm = 120 {"hint":"Distance of the arc from the window center (cm). Outside the window, 1-3 m; keep the handle within the 5 m pinch-ray reach from where the user stands."}'
     - // @input float handleDiameterCm = 4
     - '// @input float grabDiameterCm = 16 {"hint":"Invisible grab sphere around the handle (cm)."}'
     - // @input float lineWidthCm = 0.7

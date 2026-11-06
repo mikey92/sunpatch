@@ -527,7 +527,6 @@
   Enabled: true
   ScriptAsset: !<reference> ceda157c-835b-4fc6-8931-a821d60c4cbd
   ScriptInputsDefault:
-    radiusCm: true
     handleDiameterCm: true
     grabDiameterCm: true
     lineWidthCm: true
@@ -542,7 +541,7 @@
       seasonButton: !<reference.SceneObject> c72b1b87-3a27-45ef-bc5d-e3d94e1fc76b
       seasonText: !<reference.Text> 3cd9fb36-9c9a-4043-b35a-0c5184a9ec56
       handleLabel: !<reference.Text> 49af2f45-acd1-4853-88f4-65627f7fbd83
-      radiusCm: !<float> 170.000000
+      radiusCm: !<float> 120.000000
       handleDiameterCm: !<float> 4.000000
       grabDiameterCm: !<float> 16.000000
       lineWidthCm: 0.700000
@@ -2538,7 +2537,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -35.000000, y: -159.399994, z: -98.000000}
+    Position: {x: -35.000000, y: -159.399994, z: -150.000000}
     Rotation: {x: -90.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 3.000000, y: 3.000000, z: 3.000000}
     HasSegmentScaleCompensation: false
@@ -3878,6 +3877,7 @@
     liftCm: true
     maxAlpha: true
     fadeBelowDeg: true
+    featherCm: true
     rayWidthCm: true
   ScriptTypesDefault:
     {}
@@ -3888,6 +3888,7 @@
       liftCm: !<float> 1.000000
       maxAlpha: 0.550000
       fadeBelowDeg: !<float> 6.000000
+      featherCm: !<float> 14.000000
       rayMaterial: !<reference.Material> f2f331ea-d30b-43f1-b4ea-ced0582f89c5
       rayWidthCm: 0.800000
   ScriptTypes:

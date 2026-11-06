@@ -59,8 +59,8 @@ export class SunArcUI extends BaseScriptComponent {
   handleLabel: Text
 
   @input
-  @hint("Distance of the arc from the window center (cm). Outside the window, 1-3 m.")
-  radiusCm: number = 170
+  @hint("Distance of the arc from the window center (cm). Outside the window, 1-3 m; keep the handle within the 5 m pinch-ray reach from where the user stands.")
+  radiusCm: number = 120
 
   @input
   handleDiameterCm: number = 4

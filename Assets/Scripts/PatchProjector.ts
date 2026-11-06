@@ -27,6 +27,9 @@
  */
 import { WindowGeometry } from "./WindowPin"
 
+/** Fraction of the soft-patch texture (from each edge) over which it fades in. */
+const TEX_FEATHER = 0.14
+
 export type PatchState = "none" | "set" | "noDirect" | "lit"
 
 export interface PatchResult {
@@ -61,6 +64,10 @@ export class PatchProjector extends BaseScriptComponent {
   @input
   @hint("Below this sun altitude (deg) the patch fades toward the horizon.")
   fadeBelowDeg: number = 6
+
+  @input
+  @hint("Width of the soft border of the patch (cm).")
+  featherCm: number = 14
 
   @input
   @allowUndefined
@@ -253,16 +260,40 @@ export class PatchProjector extends BaseScriptComponent {
     if (this.patchObj && this.alpha <= 0.001 && this.targetAlpha === 0) this.patchObj.enabled = false
   }
 
-  /** Clips the 4 drawn corners to the floor, builds the patch mesh (window-space UVs) and the rays. */
+  /**
+   * Builds the patch mesh from the 4 drawn corners: the parallelogram is cut into 3 x 3 cells so
+   * the soft border has a fixed width in centimetres (featherCm) however long the patch is; each
+   * cell is clipped to the floor and gets texture coordinates that put the texture's fade exactly
+   * on the border cells. Then the rays.
+   */
   private buildMesh(corners: vec3[]): void {
     const rect = this.floorRect()
-    const worldPts = clipToRect(corners, rect[0], rect[1], rect[2], rect[3])
-    if (worldPts.length < 3) return
-    // Inverse of p = c0 + u (c1 - c0) + v (c3 - c0) in x/z (the projected window is a parallelogram).
-    const c0 = corners[0]
-    const ex = corners[1].sub(c0)
-    const ey = corners[3].sub(c0)
+    // The soft border straddles the true edge (half outside, half inside), so the half-bright line
+    // is exactly the geometric patch and the rays meet its corners.
+    const ex0 = corners[1].sub(corners[0])
+    const ey0 = corners[3].sub(corners[0])
+    if (ex0.length < 1e-3 || ey0.length < 1e-3) return
+    const h = this.featherCm / 2
+    const exn = ex0.normalize()
+    const eyn = ey0.normalize()
+    const c0 = corners[0].sub(exn.uniformScale(h)).sub(eyn.uniformScale(h))
+    const ex = ex0.add(exn.uniformScale(2 * h))
+    const ey = ey0.add(eyn.uniformScale(2 * h))
     const det = ex.x * ey.z - ex.z * ey.x
+    if (Math.abs(det) < 1e-6) return
+    const W = Math.sqrt(ex.x * ex.x + ex.z * ex.z)
+    const L = Math.sqrt(ey.x * ey.x + ey.z * ey.z)
+    const a = Math.min(0.45, this.featherCm / Math.max(1, W))
+    const b = Math.min(0.45, this.featherCm / Math.max(1, L))
+    const F = TEX_FEATHER
+    const sCuts = [0, a, 1 - a, 1]
+    const tCuts = [0, b, 1 - b, 1]
+    const texOf = (x: number, cuts: number[]): number => {
+      if (x <= cuts[1]) return cuts[1] > 0 ? (x / cuts[1]) * F : F
+      if (x >= cuts[2]) return 1 - F + ((x - cuts[2]) / Math.max(1e-6, 1 - cuts[2])) * F
+      return F + ((x - cuts[1]) / Math.max(1e-6, cuts[2] - cuts[1])) * (1 - 2 * F)
+    }
+    const at = (s0: number, t0: number): vec3 => c0.add(ex.uniformScale(s0)).add(ey.uniformScale(t0))
     const inv = this.patchObj.getTransform().getInvertedWorldTransform()
     const mb = new MeshBuilder([
       { name: "position", components: 3 },
@@ -272,17 +303,28 @@ export class PatchProjector extends BaseScriptComponent {
     mb.topology = MeshTopology.Triangles
     mb.indexType = MeshIndexType.UInt16
     const verts: number[] = []
-    for (const w of worldPts) {
-      const p = inv.multiplyPoint(w)
-      const dx = w.x - c0.x
-      const dz = w.z - c0.z
-      const u = Math.abs(det) > 1e-6 ? (dx * ey.z - dz * ey.x) / det : 0.5
-      const v = Math.abs(det) > 1e-6 ? (ex.x * dz - ex.z * dx) / det : 0.5
-      verts.push(p.x, p.y, p.z, 0, 1, 0, u, v)
-    }
-    mb.appendVerticesInterleaved(verts)
     const idx: number[] = []
-    for (let i = 1; i + 1 < worldPts.length; i++) idx.push(0, i, i + 1)
+    for (let j = 0; j < 3; j++) {
+      for (let i = 0; i < 3; i++) {
+        const s0 = sCuts[i], s1 = sCuts[i + 1], t0 = tCuts[j], t1 = tCuts[j + 1]
+        if (s1 - s0 < 1e-6 || t1 - t0 < 1e-6) continue
+        const cell = clipToRect([at(s0, t0), at(s1, t0), at(s1, t1), at(s0, t1)], rect[0], rect[1], rect[2], rect[3])
+        if (cell.length < 3) continue
+        const base = verts.length / 8
+        for (const w of cell) {
+          const dx = w.x - c0.x
+          const dz = w.z - c0.z
+          // Keep each vertex inside its own cell so the piecewise mapping stays exact.
+          const ss = Math.max(s0, Math.min(s1, (dx * ey.z - dz * ey.x) / det))
+          const tt = Math.max(t0, Math.min(t1, (ex.x * dz - ex.z * dx) / det))
+          const p = inv.multiplyPoint(w)
+          verts.push(p.x, p.y, p.z, 0, 1, 0, texOf(ss, sCuts), texOf(tt, tCuts))
+        }
+        for (let k = 1; k + 1 < cell.length; k++) idx.push(base, base + k, base + k + 1)
+      }
+    }
+    if (idx.length === 0) return
+    mb.appendVerticesInterleaved(verts)
     mb.appendIndices(idx)
     if (mb.isValid()) {
       mb.updateMesh()
