@@ -7,6 +7,12 @@
  * patches on walls are out of scope) and drawn 1 cm above the floor as a translucent warm gold
  * polygon. Brightness eases down as the sun nears the horizon, so the patch fades at evening.
  *
+ * Look: the patch material carries a soft-edged texture mapped in "window space" (u along the
+ * window's width, v along its height), so the light's border fades like a real patch instead of
+ * ending in a hard line. When the sun moves the drawn patch glides to the new place (about a
+ * quarter second) and appears/disappears with a short fade; with reduceMotion it jumps.
+ * Optional: four very faint rays from the window corners to the patch corners.
+ *
  * States:
  *   "none"     no window pinned
  *   "set"      sun at or below the horizon
@@ -15,6 +21,9 @@
  *
  * Expects (@input): the Floor box (unit box mesh scaled to the floor; its top face is the floor
  * plane and its x/z extent the room) and a translucent patch material.
+ *
+ * Test-facing values (getLast, isVisible) are the target geometry, updated at once; only the drawn
+ * mesh glides.
  */
 import { WindowGeometry } from "./WindowPin"
 
@@ -53,6 +62,18 @@ export class PatchProjector extends BaseScriptComponent {
   @hint("Below this sun altitude (deg) the patch fades toward the horizon.")
   fadeBelowDeg: number = 6
 
+  @input
+  @allowUndefined
+  @hint("Optional: very faint material for the 4 rays window -> patch.")
+  rayMaterial: Material
+
+  @input
+  @hint("Width of each ray line (cm).")
+  rayWidthCm: number = 0.8
+
+  /** Jump instead of gliding/fading (set by SunpatchMain). */
+  reduceMotion: boolean = false
+
   private patchObj: SceneObject
   private rmv: RenderMeshVisual
   private mat: Material
@@ -60,6 +81,14 @@ export class PatchProjector extends BaseScriptComponent {
   private targetAlpha: number = 0
   private alpha: number = 0
   private last: PatchResult = { state: "none", corners: [], polygon: [], center: vec3.zero() }
+  private win: WindowGeometry | null = null
+  private target: vec3[] = []
+  private drawn: vec3[] = []
+  private dirty: boolean = false
+  private rayObj: SceneObject | null = null
+  private rayRmv: RenderMeshVisual | null = null
+  private rayMat: Material | null = null
+  private rayBase: vec4 = new vec4(1, 0.86, 0.55, 0.12)
 
   onAwake(): void {
     if (!this.floor || !this.patchMaterial) {
@@ -73,6 +102,15 @@ export class PatchProjector extends BaseScriptComponent {
     this.rmv.mainMaterial = this.mat
     this.rmv.setRenderOrder(10)
     this.patchObj.enabled = false
+    if (this.rayMaterial) {
+      this.rayObj = global.scene.createSceneObject("SunRays")
+      this.rayRmv = this.rayObj.createComponent("Component.RenderMeshVisual") as RenderMeshVisual
+      this.rayMat = this.rayMaterial.clone()
+      this.rayBase = this.rayMat.mainPass.baseColor
+      this.rayRmv.mainMaterial = this.rayMat
+      this.rayRmv.setRenderOrder(11)
+      this.rayObj.enabled = false
+    }
     this.createEvent("UpdateEvent").bind(() => this.onUpdate())
   }
 
@@ -107,6 +145,29 @@ export class PatchProjector extends BaseScriptComponent {
     return this.alpha
   }
 
+  /** Opacity the patch is fading toward. */
+  getTargetAlpha(): number {
+    return this.targetAlpha
+  }
+
+  /** The 4 corners as currently drawn (they glide toward getLast().corners). */
+  getDrawnCorners(): vec3[] {
+    return this.drawn.slice()
+  }
+
+  /** Largest distance (cm) between a drawn corner and its target. 0 when settled. */
+  getGlideError(): number {
+    if (this.drawn.length !== 4 || this.target.length !== 4) return 0
+    let m = 0
+    for (let i = 0; i < 4; i++) m = Math.max(m, this.drawn[i].distance(this.target[i]))
+    return m
+  }
+
+  /** Whether the 4 rays are drawn. */
+  areRaysVisible(): boolean {
+    return !!this.rayObj && this.rayObj.enabled
+  }
+
   /**
    * Recomputes the patch for a window and a sun direction (unit vector toward the sun) and
    * returns the result. Pass null to clear.
@@ -132,30 +193,76 @@ export class PatchProjector extends BaseScriptComponent {
       r = { state: "lit", corners, polygon, center: new vec3(cx / ref.length, y, cz / ref.length) }
     }
     this.last = r
+    this.win = win
     if (this.isVisible()) {
-      this.buildMesh(r.polygon)
       const fade = Math.max(0.15, Math.min(1, altitudeDeg / Math.max(0.1, this.fadeBelowDeg)))
+      // Appearing from nothing: start in place (it fades in); otherwise glide from where it is.
+      if (this.drawn.length !== 4 || !this.patchObj.enabled || this.alpha <= 0.001 || this.reduceMotion) {
+        this.drawn = r.corners.slice()
+      }
+      this.target = r.corners.slice()
       this.targetAlpha = this.maxAlpha * fade
+      if (this.reduceMotion) this.alpha = this.targetAlpha
       this.patchObj.enabled = true
+      this.dirty = true
     } else {
       this.targetAlpha = 0
+      if (this.reduceMotion) this.alpha = 0
     }
     return r
   }
 
   private onUpdate(): void {
     const dt = Math.min(0.1, getDeltaTime())
-    const k = 1 - Math.exp(-dt / 0.12)
-    this.alpha += (this.targetAlpha - this.alpha) * k
-    if (Math.abs(this.alpha - this.targetAlpha) < 0.003) this.alpha = this.targetAlpha
+    if (this.reduceMotion) {
+      this.alpha = this.targetAlpha
+    } else {
+      // ~250 ms fade, ~300 ms glide (exponential ease-out).
+      const ka = 1 - Math.exp(-dt / 0.08)
+      this.alpha += (this.targetAlpha - this.alpha) * ka
+      if (Math.abs(this.alpha - this.targetAlpha) < 0.003) this.alpha = this.targetAlpha
+    }
+    if (this.target.length === 4 && this.drawn.length === 4 && this.targetAlpha > 0) {
+      const kp = this.reduceMotion ? 1 : 1 - Math.exp(-dt / 0.1)
+      let moving = false
+      for (let i = 0; i < 4; i++) {
+        const d = this.target[i].sub(this.drawn[i])
+        if (d.length < 0.05 || kp >= 1) {
+          if (d.length > 0) moving = true
+          this.drawn[i] = this.target[i]
+        } else {
+          this.drawn[i] = this.drawn[i].add(d.uniformScale(kp))
+          moving = true
+        }
+      }
+      if (moving || this.dirty) {
+        this.dirty = false
+        this.buildMesh(this.drawn)
+      }
+    }
     if (this.mat) {
       const c = this.baseColor
       this.mat.mainPass.baseColor = new vec4(c.x, c.y, c.z, this.alpha)
     }
+    if (this.rayMat && this.rayObj) {
+      const c = this.rayBase
+      const a = this.maxAlpha > 0 ? c.w * (this.alpha / this.maxAlpha) : 0
+      this.rayMat.mainPass.baseColor = new vec4(c.x, c.y, c.z, a)
+      this.rayObj.enabled = this.alpha > 0.001
+    }
     if (this.patchObj && this.alpha <= 0.001 && this.targetAlpha === 0) this.patchObj.enabled = false
   }
 
-  private buildMesh(worldPts: vec3[]): void {
+  /** Clips the 4 drawn corners to the floor, builds the patch mesh (window-space UVs) and the rays. */
+  private buildMesh(corners: vec3[]): void {
+    const rect = this.floorRect()
+    const worldPts = clipToRect(corners, rect[0], rect[1], rect[2], rect[3])
+    if (worldPts.length < 3) return
+    // Inverse of p = c0 + u (c1 - c0) + v (c3 - c0) in x/z (the projected window is a parallelogram).
+    const c0 = corners[0]
+    const ex = corners[1].sub(c0)
+    const ey = corners[3].sub(c0)
+    const det = ex.x * ey.z - ex.z * ey.x
     const inv = this.patchObj.getTransform().getInvertedWorldTransform()
     const mb = new MeshBuilder([
       { name: "position", components: 3 },
@@ -167,7 +274,11 @@ export class PatchProjector extends BaseScriptComponent {
     const verts: number[] = []
     for (const w of worldPts) {
       const p = inv.multiplyPoint(w)
-      verts.push(p.x, p.y, p.z, 0, 1, 0, 0, 0)
+      const dx = w.x - c0.x
+      const dz = w.z - c0.z
+      const u = Math.abs(det) > 1e-6 ? (dx * ey.z - dz * ey.x) / det : 0.5
+      const v = Math.abs(det) > 1e-6 ? (ex.x * dz - ex.z * dx) / det : 0.5
+      verts.push(p.x, p.y, p.z, 0, 1, 0, u, v)
     }
     mb.appendVerticesInterleaved(verts)
     const idx: number[] = []
@@ -176,6 +287,50 @@ export class PatchProjector extends BaseScriptComponent {
     if (mb.isValid()) {
       mb.updateMesh()
       this.rmv.mesh = mb.getMesh()
+    }
+    this.buildRays(corners)
+  }
+
+  /** Four thin cross-shaped strips from the window corners to the patch corners. */
+  private buildRays(corners: vec3[]): void {
+    if (!this.rayObj || !this.rayRmv || !this.win) return
+    const inv = this.rayObj.getTransform().getInvertedWorldTransform()
+    const mb = new MeshBuilder([
+      { name: "position", components: 3 },
+      { name: "normal", components: 3, normalized: true },
+      { name: "texture0", components: 2 },
+    ])
+    mb.topology = MeshTopology.Triangles
+    mb.indexType = MeshIndexType.UInt16
+    const verts: number[] = []
+    const idx: number[] = []
+    const hw = this.rayWidthCm / 2
+    for (let i = 0; i < 4; i++) {
+      const a = this.win.corners[i]
+      const b = corners[i]
+      const d = b.sub(a)
+      if (d.length < 1) continue
+      const dir = d.normalize()
+      let s1 = dir.cross(vec3.up())
+      if (s1.length < 1e-3) s1 = vec3.right()
+      s1 = s1.normalize()
+      const s2 = dir.cross(s1).normalize()
+      for (const side of [s1, s2]) {
+        const o = side.uniformScale(hw)
+        const base = verts.length / 8
+        for (const p of [a.sub(o), a.add(o), b.add(o), b.sub(o)]) {
+          const q = inv.multiplyPoint(p)
+          verts.push(q.x, q.y, q.z, 0, 1, 0, 0, 0)
+        }
+        idx.push(base, base + 1, base + 2, base, base + 2, base + 3)
+      }
+    }
+    if (verts.length === 0) return
+    mb.appendVerticesInterleaved(verts)
+    mb.appendIndices(idx)
+    if (mb.isValid()) {
+      mb.updateMesh()
+      this.rayRmv.mesh = mb.getMesh()
     }
   }
 }

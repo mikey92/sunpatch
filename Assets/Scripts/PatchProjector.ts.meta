@@ -33,6 +33,8 @@
     liftCm: false
     maxAlpha: false
     patchMaterial: false
+    rayMaterial: false
+    rayWidthCm: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -47,6 +49,8 @@
       liftCm: !<float> 1.000000
       maxAlpha: 0.550000
       fadeBelowDeg: !<float> 6.000000
+      rayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      rayWidthCm: 0.800000
   ScriptTypes:
     -
       {}
@@ -56,3 +60,5 @@
     - '// @input float liftCm = 1 {"hint":"Height of the patch above the floor (cm)."}'
     - '// @input float maxAlpha = 0.55 {"hint":"Peak opacity of the patch.", "widget":"slider", "min":0.1, "max":1, "step":0.05}'
     - '// @input float fadeBelowDeg = 6 {"hint":"Below this sun altitude (deg) the patch fades toward the horizon."}'
+    - '// @input Asset.Material rayMaterial {"hint":"Optional: very faint material for the 4 rays window -> patch."}'
+    - '// @input float rayWidthCm = 0.8 {"hint":"Width of each ray line (cm)."}'
