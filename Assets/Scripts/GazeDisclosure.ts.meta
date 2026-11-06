@@ -29,11 +29,13 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     arc: false
+    arrowDistanceCm: false
     cameraObject: false
     chime: false
-    dwellSec: false
-    inViewFraction: false
+    exitMarginCm: false
+    inFraction: false
     main: false
+    outFraction: false
     overlayMaterial: false
     projector: false
     windowMargin: false
@@ -53,8 +55,10 @@
       overlayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       chime: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
       windowMargin: !<Vec3> {x: 80.000000, y: 50.000000, z: 140.000000}
-      dwellSec: 0.150000
-      inViewFraction: 0.850000
+      exitMarginCm: !<float> 15.000000
+      outFraction: 0.850000
+      inFraction: 0.750000
+      arrowDistanceCm: !<float> 100.000000
   ScriptTypes:
     -
       {}
@@ -64,7 +68,9 @@
     - // @input AssignableType_3 projector
     - '// @input SceneObject cameraObject {"hint":"Camera object (gaze = its forward ray)."}'
     - '// @input Asset.Material overlayMaterial {"hint":"Material that ignores depth, for the edge arrow."}'
-    - '// @input Asset.AudioTrackAsset chime {"hint":"Soft chime played once when the patch first goes out of view."}'
+    - '// @input Asset.AudioTrackAsset chime {"hint":"Soft chime played when the light moved out of view after a pin or a season change."}'
     - '// @input vec3 windowMargin = {80,50,140} {"hint":"Extra margin around the window that still counts as looking at it (cm): sides, below, above."}'
-    - '// @input float dwellSec = 0.15 {"hint":"Seconds a new gaze class must hold before it switches."}'
-    - "// @input float inViewFraction = 0.85 {\"hint\":\"Fraction of the half field of view that counts as 'in view' for the patch.\"}"
+    - '// @input float exitMarginCm = 15 {"hint":"Extra margin (cm) on the way out of the window or floor area (spatial hysteresis)."}'
+    - '// @input float outFraction = 0.85 {"hint":"Fraction of the half field of view: out of view past this..."}'
+    - '// @input float inFraction = 0.75 {"hint":"...and back in view within this."}'
+    - '// @input float arrowDistanceCm = 100 {"hint":"Distance of the arrow ahead of the eye (cm)."}'

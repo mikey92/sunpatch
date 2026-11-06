@@ -4,8 +4,10 @@
  * First, with motion on, a season change leaves the drawn patch still gliding (> 1 cm from its new
  * place on the next frame), which shows the normal glide exists. Then with reduceMotion on:
  * a season change puts the patch in its new place on the next frame (glide error 0, opacity at
- * its target); gaze switches put the arc and label at fully on/off right after the 150 ms dwell,
- * with no partial opacity.
+ * its target); gaze switches put the arc and label at fully on/off right after the gaze dwell
+ * (120 ms in, 250 ms back to "elsewhere"; the dwell is a filter, so it stays), with no partial
+ * opacity. The first part also covers the season change: the move is larger than 150 cm, so the
+ * patch crossfades (it does not sweep across the room).
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { nextFrame } from "Leaf.lspkg/Utils/common/Utils"
@@ -29,6 +31,7 @@ export class SunpatchC11ReduceMotionScenario extends Scenario {
     const glideOn: number = api.getPatchGlideError()
     log("motion on: glide error one frame after the season change " + glideOn.toFixed(1) + " cm")
     check(glideOn > 1, "with motion, the patch glides to its new place")
+    check(api.getPatchTargetAlpha() < 0.01, "a move over 150 cm fades out first instead of sweeping (target " + api.getPatchTargetAlpha().toFixed(3) + ")")
     await waitFor(() => api.getPatchGlideError() < 0.01, 3000, "patch settled again")
 
     api.setReduceMotion(true)
@@ -39,7 +42,8 @@ export class SunpatchC11ReduceMotionScenario extends Scenario {
     log("reduceMotion: glide error one frame after the season change " + glideOff.toFixed(3) + " cm, alpha "
       + api.getPatchAlpha().toFixed(3) + " / target " + api.getPatchTargetAlpha().toFixed(3))
     check(glideOff < 0.01, "patch jumps to its new place")
-    check(Math.abs(api.getPatchAlpha() - api.getPatchTargetAlpha()) < 1e-3, "patch opacity at its target at once")
+    check(api.getPatchTargetAlpha() > 0.2 && Math.abs(api.getPatchAlpha() - api.getPatchTargetAlpha()) < 1e-3,
+      "patch fully visible at its target opacity at once")
 
     await lookAt("window", 200)
     check(arc.getArcOpacity() === 1 && api.getLabelOpacity() === 0, "window: arc fully on, label fully off at once ("
@@ -47,7 +51,7 @@ export class SunpatchC11ReduceMotionScenario extends Scenario {
     await lookAt("floor", 200)
     check(arc.getArcOpacity() === 0 && api.getLabelOpacity() === 1, "floor: arc fully off, label fully on at once ("
       + arc.getArcOpacity() + ", " + api.getLabelOpacity() + ")")
-    await lookAt("away", 200)
+    await lookAt("away", 350)
     check(arc.getArcOpacity() === 0 && api.getLabelOpacity() === 0, "elsewhere: both off at once")
     restoreLive()
     log("C11 done")

@@ -33,10 +33,14 @@
     demoMinute: false
     headingSign: false
     label: false
+    labelHeightCm: false
+    labelScale: false
     latitudeDeg: false
     longitudeDeg: false
     minusZAzimuthDeg: false
     northMarker: false
+    pinchHint: false
+    previewNote: false
     projector: false
     reduceMotion: false
     startSeason: false
@@ -55,6 +59,8 @@
       label: !<reference.Text> 00000000-0000-0000-0000-000000000000
       cameraObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       northMarker: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      previewNote: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      pinchHint: !<reference.Text> 00000000-0000-0000-0000-000000000000
       latitudeDeg: 51.507401
       longitudeDeg: -0.127800
       minusZAzimuthDeg: !<float> 165.000000
@@ -65,6 +71,8 @@
       reduceMotion: false
       startUtc: ""
       startSeason: today
+      labelHeightCm: !<float> 25.000000
+      labelScale: !<float> 6.000000
   ScriptTypes:
     -
       {}
@@ -74,16 +82,20 @@
     - '// @input Component.Text label {"hint":"Text for the patch / window label."}'
     - '// @input SceneObject cameraObject {"hint":"The device camera (labels turn toward it)."}'
     - '// @input SceneObject northMarker {"hint":"Floor marker whose local -Z is turned to point north."}'
+    - '// @input Component.Text previewNote {"hint":"Standing preview note next to the north marker (it turns toward the eye)."}'
+    - '// @input Component.Text pinchHint {"hint":"Onboarding hint shown above the window you face until the first pin."}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"group_start", "label":"Place (preview stand-in)"}'
-    - '// @input float latitudeDeg = 51.5074 {"hint":"Latitude, degrees north. Preview: London."}'
-    - '// @input float longitudeDeg = -0.1278 {"hint":"Longitude, degrees east. Preview: London."}'
+    - '// @input float latitudeDeg = 51.5074 {"hint":"Latitude, degrees north. Preview: London. The clock stays UK time (GMT/BST) whatever the place."}'
+    - '// @input float longitudeDeg = -0.1278 {"hint":"Longitude, degrees east. Preview: London. The clock stays UK time (GMT/BST) whatever the place."}'
     - '// @input float minusZAzimuthDeg = 200 {"hint":"Compass azimuth of world -Z (the way the user faces at start). Preview constant."}'
     - '// @input float headingSign = 1 {"hint":"+1, or -1 if the heading source turns the other way (preview sign-flip constant)."}'
     - '// @ui {"widget":"group_end"}'
     - '// @input string startWindow {"hint":"Window pinned at start (empty = none until the user pinches one)."}'
-    - '// @input float demoHour = 15 {"hint":"If the sun is down now at the place, start at this clock time today (HH, MM)."}'
+    - '// @input float demoHour = 15 {"hint":"If the sun is down or low now at the place, start at this clock time today (HH, MM)."}'
     - // @input float demoMinute = 10
     - '// @input bool reduceMotion {"hint":"Calmer: no glides or fades, everything switches at once."}'
     - '// @input string startUtc {"hint":"Optional fixed start instant (ISO, e.g. 2026-11-06T15:10:00Z) for demos; empty = start rule."}'
     - '// @input string startSeason = "today" {"hint":"Season at start: today, dec21 or jun21."}'
+    - '// @input float labelHeightCm = 25 {"hint":"Label height above the patch (cm)."}'
+    - '// @input float labelScale = 6 {"hint":"Label scale (48 pt x 6 = about 4.5 cm cap height)."}'

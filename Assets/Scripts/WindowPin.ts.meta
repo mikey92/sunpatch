@@ -31,6 +31,7 @@
     boxMesh: false
     heightCm: false
     highlightMaterial: false
+    outlineWidthCm: false
     widthCm: false
   ScriptTypesHidden:
     {}
@@ -45,6 +46,7 @@
       heightCm: !<float> 100.000000
       boxMesh: !<reference.RenderMesh> 00000000-0000-0000-0000-000000000000
       highlightMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      outlineWidthCm: !<float> 2.000000
   ScriptTypes:
     -
       {}
@@ -52,4 +54,5 @@
     - '// @input float widthCm = 120 {"hint":"Window opening width (cm)."}'
     - '// @input float heightCm = 100 {"hint":"Window opening height (cm)."}'
     - '// @input Asset.RenderMesh boxMesh {"hint":"Optional: unit box mesh for the aimed-at glow."}'
-    - '// @input Asset.Material highlightMaterial {"hint":"Optional: translucent material for the aimed-at glow."}'
+    - '// @input Asset.Material highlightMaterial {"hint":"Optional: translucent material for the aimed-at glow and the outline."}'
+    - '// @input float outlineWidthCm = 2 {"hint":"Outline line width (cm), drawn over the frame."}'

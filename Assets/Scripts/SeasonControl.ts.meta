@@ -1,0 +1,71 @@
+- !<AssetImportMetadata/68ac957c-c15d-4cb3-b009-56b72c11cfc2>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> c7b46386-9c19-4833-afa4-ae8eccccf62a
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> c7b46386-9c19-4833-afa4-ae8eccccf62a
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 23cc0824-5464-4728-b78a-14ebea3a48f6
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/23cc0824-5464-4728-b78a-14ebea3a48f6>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: d0c72461-13b9-4bf5-ab14-86fa4c839f88
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    main: false
+    overlayMaterial: false
+    partGapCm: false
+    partHeightCm: false
+    partWidthCm: false
+    parts: false
+    textScale: false
+    tick: false
+    windowGapCm: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - main: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      overlayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      parts: !<reference.SceneObject[]>
+        []
+      partWidthCm: !<float> 16.000000
+      partHeightCm: !<float> 10.000000
+      partGapCm: !<float> 2.000000
+      windowGapCm: !<float> 20.000000
+      textScale: !<float> 6.000000
+      tick: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input AssignableType_1 main
+    - '// @input Asset.Material overlayMaterial {"hint":"Unlit material that ignores depth (drawn over the wall, as on glasses)."}'
+    - '// @input SceneObject[] parts {"hint":"The three parts in order: Today, Dec 21, Jun 21 (each holds a child Text)."}'
+    - // @input float partWidthCm = 16
+    - // @input float partHeightCm = 10
+    - // @input float partGapCm = 2
+    - "// @input float windowGapCm = 20 {\"hint\":\"Gap between the window's right edge and the control (cm).\"}"
+    - '// @input float textScale = 6 {"hint":"Text scale (48 pt x 6 = about 4.5 cm cap height)."}'
+    - '// @input Asset.AudioTrackAsset tick {"hint":"Short soft tick played when a part is chosen."}'

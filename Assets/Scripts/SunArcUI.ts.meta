@@ -28,17 +28,23 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    buttonGapCm: false
+    arcEndLabel: false
+    arcStartLabel: false
     cameraObject: false
+    clockOffsetCm: false
+    clockScale: false
+    dotCm: false
+    dragHint: false
     grabDiameterCm: false
+    haloDiameterCm: false
     handleDiameterCm: false
+    handleEvent: false
     handleLabel: false
+    lineGrabCm: false
     lineWidthCm: false
     main: false
     overlayMaterial: false
     radiusCm: false
-    seasonButton: false
-    seasonText: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -51,14 +57,20 @@
     - main: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
       overlayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       cameraObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      seasonButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      seasonText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       handleLabel: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      handleEvent: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      dragHint: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      arcStartLabel: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      arcEndLabel: !<reference.Text> 00000000-0000-0000-0000-000000000000
       radiusCm: !<float> 170.000000
       handleDiameterCm: !<float> 4.000000
+      haloDiameterCm: !<float> 12.000000
       grabDiameterCm: !<float> 16.000000
       lineWidthCm: 0.700000
-      buttonGapCm: !<float> 15.000000
+      lineGrabCm: !<float> 10.000000
+      dotCm: !<float> 3.000000
+      clockScale: !<float> 7.000000
+      clockOffsetCm: !<float> 12.000000
   ScriptTypes:
     -
       {}
@@ -66,11 +78,17 @@
     - // @input AssignableType_1 main
     - '// @input Asset.Material overlayMaterial {"hint":"Material that ignores depth (drawn over the wall, as on glasses)."}'
     - // @input SceneObject cameraObject
-    - '// @input SceneObject seasonButton {"hint":"UI Kit button for the season (RectangleButton)."}'
-    - '// @input Component.Text seasonText {"hint":"Text inside the season button."}'
-    - '// @input Component.Text handleLabel {"hint":"Small clock readout above the handle."}'
-    - '// @input float radiusCm = 120 {"hint":"Distance of the arc from the window center (cm). Outside the window, 1-3 m; keep the handle within the 5 m pinch-ray reach from where the user stands."}'
-    - // @input float handleDiameterCm = 4
-    - '// @input float grabDiameterCm = 16 {"hint":"Invisible grab sphere around the handle (cm)."}'
-    - // @input float lineWidthCm = 0.7
-    - '// @input float buttonGapCm = 15 {"hint":"Gap between the window edge and the season button (cm)."}'
+    - '// @input Component.Text handleLabel {"hint":"Clock readout above the handle."}'
+    - '// @input Component.Text handleEvent {"hint":"Event line above the clock (\"Sunset 16:24\")."}'
+    - '// @input Component.Text dragHint {"hint":"Onboarding hint \"Drag the sun\" below the handle."}'
+    - '// @input Component.Text arcStartLabel {"hint":"Small clock at the start of the visible arc."}'
+    - '// @input Component.Text arcEndLabel {"hint":"Small clock at the end of the visible arc."}'
+    - '// @input float radiusCm = 120 {"hint":"Distance of the arc from the window center (cm). Keep the handle within the 5 m pinch-ray reach."}'
+    - // @input float handleDiameterCm = 6
+    - // @input float haloDiameterCm = 12
+    - '// @input float grabDiameterCm = 24 {"hint":"Invisible grab sphere around the handle (cm)."}'
+    - // @input float lineWidthCm = 1.2
+    - '// @input float lineGrabCm = 10 {"hint":"Thickness of the invisible grab capsules along the line (cm)."}'
+    - // @input float dotCm = 3
+    - '// @input float clockScale = 7 {"hint":"Clock text scale (48 pt x 7 = about 5.3 cm cap height)."}'
+    - '// @input float clockOffsetCm = 12 {"hint":"Clock height above the handle (cm)."}'

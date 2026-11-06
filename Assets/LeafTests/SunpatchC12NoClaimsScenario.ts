@@ -4,8 +4,9 @@
  * judgement words ("safe", "good", "best", ...) and no other numbers (no scores, percentages or
  * hours of sun).
  * Sweep: the three windows x Today / Dec 21 / Jun 21 x every hour of 2026-11-06 (London). For each
- * state the patch label and the handle readout are checked; every few states all Text components
- * under the Lens's own objects (room, Lens UI, season button, preview note) are checked too.
+ * state the patch label, the handle readout and the season control are checked; every few states
+ * all Text components under the Lens's own root objects (found from the Lens script and the pinned
+ * window, not by name) are checked too, and that walk must find texts (it cannot pass empty).
  */
 import { Scenario } from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import { nextFrame } from "Leaf.lspkg/Utils/common/Utils"
@@ -28,7 +29,12 @@ function problem(text: string): string {
   return ""
 }
 
-function lensTexts(): string[] {
+/**
+ * Every Text under the Lens's own root objects: the roots of the Lens script's object and of the
+ * pinned window (room, windows, preview note, Lens UI, season control). Found from the objects
+ * themselves, not by name.
+ */
+function lensTexts(api: any): string[] {
   const out: string[] = []
   const walk = (o: SceneObject): void => {
     if (!o.isEnabledInHierarchy) return
@@ -36,10 +42,15 @@ function lensTexts(): string[] {
     if (t && t.text) out.push(t.text)
     for (let i = 0; i < o.getChildrenCount(); i++) walk(o.getChild(i))
   }
-  for (let i = 0; i < global.scene.getRootObjectsCount(); i++) {
-    const r = global.scene.getRootObject(i)
-    if (r.name === "SunpatchRoom" || r.name === "Sunpatch") walk(r)
+  const rootOf = (o: SceneObject): SceneObject => {
+    let r = o
+    while (r.getParent()) r = r.getParent()
+    return r
   }
+  const roots: SceneObject[] = [rootOf(api.getSceneObject())]
+  const w = api.getPinnedWindow()
+  if (w) { const r = rootOf(w.getSceneObject()); if (roots.indexOf(r) < 0) roots.push(r) }
+  for (const r of roots) walk(r)
   return out
 }
 
@@ -49,6 +60,8 @@ export class SunpatchC12NoClaimsScenario extends Scenario {
     await waitForLensUp()
     const api = sp()
     const arc = (global as any).sunArc
+    const ctl = (global as any).seasonControl
+    let walked = 0
     const seen: { [k: string]: boolean } = {}
     let checked = 0
     let bad = ""
@@ -62,8 +75,14 @@ export class SunpatchC12NoClaimsScenario extends Scenario {
         for (let h = 0; h < 24; h++) {
           api.setTime(h, 30)
           await nextFrame()
-          const texts = [api.getLabel(), arc.getHandleText(), arc.getSeasonText()]
-          if (h % 6 === 0) for (const t of lensTexts()) texts.push(t)
+          const texts: string[] = [api.getLabel(), arc.getHandleText(), api.getPreviewNoteText()]
+          for (const p of ctl.getParts()) texts.push(p.text)
+          for (const t of arc.getEndLabels()) texts.push(t)
+          if (h % 6 === 0) {
+            const lt = lensTexts(api)
+            walked = Math.max(walked, lt.length)
+            for (const t of lt) texts.push(t)
+          }
           for (const t of texts) {
             if (!t) continue
             checked++
@@ -76,11 +95,12 @@ export class SunpatchC12NoClaimsScenario extends Scenario {
     }
     const kinds = Object.keys(seen)
     log(checked + " texts checked, " + kinds.length + " distinct, e.g. " + kinds.slice(0, 12).join(" | "))
+    check(walked >= 5, "the scene walk found the Lens's texts (" + walked + ")")
     check(bad === "", "no judgement words or unexplained numbers" + (bad ? ": " + bad : ""))
     // The checker itself rejects what it should.
     check(problem("Best spot · 4.5 h of sun") !== "" && problem("Safe for plants") !== "" && problem("70% sun") !== "",
       "the checker rejects a judgement, an hours-of-sun number and a percentage")
-    check(problem("15:10 · Nov 6") === "" && problem("Sun has set\nSunset 16:24") === "", "the checker accepts clock times and dates")
+    check(problem("15:10 · Nov 6") === "" && problem("Sun has set\nSunset 16:24\n20:00 · Today") === "", "the checker accepts clock times and dates")
     restoreLive()
     api.pinWindow("WindowSouth")
     log("C12 done")

@@ -12,6 +12,8 @@ import { SunpatchC9OffViewArrowScenario } from "./SunpatchC9OffViewArrowScenario
 import { SunpatchC10GazeSwitchScenario } from "./SunpatchC10GazeSwitchScenario"
 import { SunpatchC11ReduceMotionScenario } from "./SunpatchC11ReduceMotionScenario"
 import { SunpatchC12NoClaimsScenario } from "./SunpatchC12NoClaimsScenario"
+import { SunpatchC13HandleReachScenario } from "./SunpatchC13HandleReachScenario"
+import { SunpatchC14FirstMinuteScenario } from "./SunpatchC14FirstMinuteScenario"
 import { SunpatchPoseScenario } from "./SunpatchPoseScenario"
 
 @component
@@ -30,6 +32,8 @@ export class LeafIndex extends BaseScriptComponent {
     { id: "sunpatch-c10-gaze-switch", typename: SunpatchC10GazeSwitchScenario.getTypeName() },
     { id: "sunpatch-c11-reduce-motion", typename: SunpatchC11ReduceMotionScenario.getTypeName() },
     { id: "sunpatch-c12-no-claims", typename: SunpatchC12NoClaimsScenario.getTypeName() },
+    { id: "sunpatch-c13-handle-reach", typename: SunpatchC13HandleReachScenario.getTypeName() },
+    { id: "sunpatch-c14-first-minute", typename: SunpatchC14FirstMinuteScenario.getTypeName() },
     {
       id: "sunpatch-pose",
       typename: SunpatchPoseScenario.getTypeName(),
